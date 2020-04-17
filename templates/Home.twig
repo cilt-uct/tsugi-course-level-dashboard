@@ -51,7 +51,7 @@
                     console.log(data);
                     if (_data.success == "1") {
                         $("#graphs").html(tmpl('tmpl-graphs', _data.results));
-                        $("#last").html(tmpl('tmpl-last-saved', {'updated' : _data.updated }));
+                        $("#last").html(tmpl('tmpl-last-saved', {'participants': _data.total, 'updated' : _data.updated }));
                         $('.tt').tooltipster({ theme: 'tooltipster-borderless', distance: 0, animationDuration: 200, animation: 'grow'});
                     } else {
                         showState(1);

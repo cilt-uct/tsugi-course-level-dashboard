@@ -16,6 +16,9 @@
     <div class="item_{%=o.c%} tt" style="flex: {%=p%};" title="{%=(o.t != ''? o.t+": " : "")%}{%=Math.round(p, 2)%} % ({%=o.v%})"></div>
 </script>
 <script type="text/x-tmpl" id="tmpl-last-saved">
+    <i class="fas fa-users"></i>&nbsp;
+    Students: <span>{%=o.participants%}</span>
+    &nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;
     <i class="far fa-clock"></i>&nbsp;
     {% if (o.updated != '') { %}Last updated: <span>{%=moment(o.updated).calendar()%}</span>{% } else { %}Last saved: <span>Never</span> {% } %}
 </script>
