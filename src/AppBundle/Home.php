@@ -50,7 +50,7 @@ class Home {
             ,'publisher' => 'University of Cape Town'
             ,'done' => 0
             ,'msg'  => 'Application failure.'
-        ));
+        );
 
         return $app['twig']->render('Home.twig', $context);
     }
