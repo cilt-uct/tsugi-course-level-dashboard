@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 use \Tsugi\Core\Settings;
 use \Tsugi\Util\Net;
+use DateTime;
 
 class Home {
 
@@ -54,19 +55,46 @@ class Home {
         return $app['twig']->render('Home.twig', $context);
     }
 
+    private function getValues($title, $total, $arr) {
+
+        $result = array();
+        $cloned = array_replace([], $arr);
+        $max = $total;
+
+        for ($x = 0; $x < count($cloned); $x ++) {
+        
+            $arr[$x]->v = rand(0, $max);
+            $max -= $arr[$x]->v;
+            $max = $max > 0 ? $max : 0;
+        }
+        $cloned[count($cloned)-1]->v = $max;
+
+        return array("title" => $title, "results" => $cloned);
+    }
+
     public function getInfo(Request $request, Application $app) {
 
-        $result = '[]';
-        if ($app['config']["production"]) {
-            $result = '[
-                {"title": "Access Survey", "results": [{"t": "", "c": "green", "v": 6},{"t": "", "c": "orange", "v": 6}, {"t": "", "c": "red", "v": 6}]},
-                {"title": "Orientation", "results":  [{"t": "", "c": "green", "v": 6},{"t": "", "c": "orange", "v": 6}, {"t": "", "c": "red", "v": 6}]},
-                {"title": "Poll", "results":  [{"t": "", "c": "green", "v": 6},{"t": "", "c": "orange", "v": 6}, {"t": "", "c": "gray", "v": 6}]}
-            ]';    
-        }
-        // {"production":"","url":"https:\/\/api.server.com\/v.1.0\/","username":"username","password":"password"}
+        $result = array("success" => 0);
 
-        return new Response($result, 200, ['Content-Type' => 'application/json']);
+        // {"production":"","url":"https:\/\/api.server.com\/v.1.0\/","username":"username","password":"password"}
+        // if ($app['config']["production"])
+            
+            $arr_4 = '[{"t": "Good", "c": "green", "v": 0},{"t": "Unsure", "c": "orange", "v": 0}, {"t": "Bad", "c": "red", "v": 0}, {"t": "Unknown", "c": "red", "v": 0}]';
+            $arr_3 = '[{"t": "Good", "c": "green", "v": 0},{"t": "Unsure", "c": "orange", "v": 0}, {"t": "No response", "c": "gray", "v": 0}]';
+
+            $result = array("total" => 128, 
+                            "success" => 1, 
+                            "updated"=> (new DateTime())->format('Y-m-d H:i:s'));
+            $result["results"] = array(
+                                    $this->getValues("Access Survey", $result['total'], json_decode($arr_4)),
+                                    $this->getValues("Orientation", $result['total'], json_decode($arr_4)),
+                                    $this->getValues("Poll", $result['total'], json_decode($arr_3)),
+                                    $this->getValues("Week 1", $result['total'], json_decode($arr_4)),
+                                    $this->getValues("Week 2", $result['total'], json_decode($arr_4))
+                                );
+        // }
+
+        return new Response(json_encode($result), 200, ['Content-Type' => 'application/json']);
     }
 
     public function getFile(Request $request, Application $app, $file = '') {

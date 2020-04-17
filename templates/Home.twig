@@ -25,9 +25,10 @@
     <script src="{{script}}" type="text/javascript"></script>
 {% endfor %}
     <script>
+    var data = [];
     $(function() {
 
-        var data = [],
+        var 
             showState = function(_state, instant) {
                 _state = _state || 0;
                 instant = instant || false;
@@ -45,12 +46,12 @@
             },
             init = function() {
                 showState(0, true);
-                console.log("fetch");
                 $.get('{{getUrl}}', function(_data) {
                     data = _data;
-                    if (_data.length > 0) {
-                        $("#graphs").html(tmpl('tmpl-graphs', data));
-                        $("#last").html(tmpl('tmpl-last-saved', {'updated' : '{{ selected.updated }}'}));
+                    console.log(data);
+                    if (_data.success == "1") {
+                        $("#graphs").html(tmpl('tmpl-graphs', _data.results));
+                        $("#last").html(tmpl('tmpl-last-saved', {'updated' : _data.updated }));
                         $('.tt').tooltipster({ theme: 'tooltipster-borderless', distance: 0, animationDuration: 200, animation: 'grow'});
                     } else {
                         showState(1);
