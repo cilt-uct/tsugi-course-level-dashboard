@@ -1,8 +1,9 @@
 {% extends "@Tsugi/Page.twig" %}
 
 {% block head %}
-    <link rel="stylesheet" type="text/css" href="{{style}}"/>
-    <link rel="stylesheet" type="text/css" href="{{tooltip_css}}"/>
+    {% for style in styles %}
+        <link rel="stylesheet" type="text/css" href="{{style}}"/>
+    {% endfor %}
     <script type="text/javascript">
         Array.prototype.sum = function (prop) {
             var total = 0
@@ -20,25 +21,51 @@
 {% endblock %}
 
 {% block footer %}
-    {{ result | json_encode() }}
-    <script src="{{path}}/js/moment.min.js"></script>
-    <script src="{{tooltip_js}}"></script>
+{% for script in scripts %}
+    <script src="{{script}}" type="text/javascript"></script>
+{% endfor %}
     <script>
-    var data = [
-        {"title": "Access Survey", "results": [{"t": "", "c": "green", "v": 6},{"t": "", "c": "orange", "v": 6}, {"t": "", "c": "red", "v": 6}]},
-        {"title": "Orientation", "results":  [{"t": "", "c": "green", "v": 6},{"t": "", "c": "orange", "v": 6}, {"t": "", "c": "red", "v": 6}]},
-        {"title": "Poll", "results":  [{"t": "", "c": "green", "v": 6},{"t": "", "c": "orange", "v": 6}, {"t": "", "c": "gray", "v": 6}]}
-    ];
-
     $(function() {
-        var save_timer = null,
-            clear_msg_timeout = null,
-            updated = {% if (selected.answer == "-1") %}false{% else %}true{% endif %};
 
-        $("#last").html(tmpl('tmpl-last-saved', {'updated' : '{{ selected.updated }}'}));
-        $("#graphs").html(tmpl('tmpl-graphs', data));
-        
-        $('.tt').tooltipster({ theme: 'tooltipster-borderless', distance: 0, animationDuration: 200, animation: 'grow'});
+        var data = [],
+            showState = function(_state, instant) {
+                _state = _state || 0;
+                instant = instant || false;
+                if (instant) {
+                    $("#graphs").html(tmpl('tmpl-state', {state: _state, svg: '{{loader_svg}}'}));
+                } else {
+                    if ($('#state:visible').length) {
+                        $('#state').fadeOut(350, function() {
+                        showState(_state);
+                        });
+                    } else {
+                        $("#graphs").hide().html(tmpl('tmpl-state', {state: _state, svg: '{{loader_svg}}'})).fadeIn(300);
+                    }
+                }
+            },
+            init = function() {
+                showState(0, true);
+                console.log("fetch");
+                $.get('{{getUrl}}', function(_data) {
+                    data = _data;
+                    if (_data.length > 0) {
+                        $("#graphs").html(tmpl('tmpl-graphs', data));
+                        $("#last").html(tmpl('tmpl-last-saved', {'updated' : '{{ selected.updated }}'}));
+                        $('.tt').tooltipster({ theme: 'tooltipster-borderless', distance: 0, animationDuration: 200, animation: 'grow'});
+                    } else {
+                        showState(1);
+                    }
+                }).fail(function() {
+                    showState(2);
+                });
+            };
+
+        $("#graphs").on("click","#state a", function(event) {
+            event.preventDefault();
+            init();
+        });
+
+        init();
     });
     </script>
     {{ source('tmpl.html', ignore_missing = true) }}

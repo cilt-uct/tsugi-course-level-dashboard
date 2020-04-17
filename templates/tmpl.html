@@ -19,3 +19,14 @@
     <i class="far fa-clock"></i>&nbsp;
     {% if (o.updated != '') { %}Last updated: <span>{%=moment(o.updated).calendar()%}</span>{% } else { %}Last saved: <span>Never</span> {% } %}
 </script>
+<script type="text/x-tmpl" id="tmpl-state">
+<div id="state" class="fa-3x">
+    <div>
+        {% switch(o.state) { 
+            case 0: %}<img src="{%=o.svg%}" width="40" alt=""> Loading course information ... {% break; 
+            case 1: %}<a href="#">The course information is empty <small>(click to retry)</small>.</a>{% break; 
+            case 2: %}<span class="error">Course information could not be loaded.</span>{% break; 
+        } %}
+    </div>
+</div>
+</script>

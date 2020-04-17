@@ -11,19 +11,17 @@ use \Tsugi\Util\Net;
 
 class Home {
 
-    public function get(Request $request, Application $app)
-    {
+    public function getPage(Request $request, Application $app) {
         global $CFG, $PDOX;
         $p = $CFG->dbprefix;
 
         $EID = $app['tsugi']->context->launch->ltiRawParameter('lis_person_sourcedid', $app['tsugi']->user->id);
         
         $context = array();
-        $context['style'] = str_replace("\\","/",$CFG->getCurrentFileUrl('static/user.css')) .'?t='. time();
-        $context['tooltip_css'] = str_replace("\\","/",$CFG->getCurrentFileUrl('static/tooltipster.bundle.min.css'));
-        $context['tooltip_js'] = str_replace("\\","/",$CFG->getCurrentFileUrl('static/tooltipster.bundle.min.js'));
-
-	    $context['submit'] = addSession(str_replace("\\","/",$CFG->getCurrentFileUrl('index.php')));
+        $context['styles']  = [ addSession('static/tooltipster.bundle.min.css'), addSession('static/user.css') ];
+        $context['scripts'] = [ addSession($CFG->staticroot .'/js/moment.min.js'), addSession('static/tooltipster.bundle.min.js') ];
+        $context['loader_svg'] = addSession('static/grid.svg');
+	    $context['getUrl'] = addSession('info');
         
         $rows = $PDOX->allRowsDie("SELECT answer, updated FROM {$p}Orientation_Questions
                     WHERE EID = :EID and user_id = :user_id",
@@ -35,7 +33,8 @@ class Home {
             $context['selected'] = array('answer' => -1, 'updated' => '');
         }
                 
-        $context['path'] = $CFG->staticroot;
+        $context['config'] = $app['config'];
+
         $context['result'] = array( 
             'ext_sakai_server' => $app['tsugi']->context->launch->ltiRawParameter('ext_sakai_server','none')
             ,'ext_sakai_serverid' => $app['tsugi']->context->launch->ltiRawParameter('ext_sakai_serverid','none') 
@@ -55,24 +54,50 @@ class Home {
         return $app['twig']->render('Home.twig', $context);
     }
 
-    public function post(Request $request, Application $app) {
-        global $CFG, $PDOX;
-        $p = $CFG->dbprefix;
+    public function getInfo(Request $request, Application $app) {
 
-        $EID = $app['tsugi']->context->launch->ltiRawParameter('lis_person_sourcedid', $app['tsugi']->user->id);
-        $PDOX->queryDie("INSERT INTO {$p}Orientation_Questions
-            (link_id, user_id, ipaddr, EID, answer, updated)
-            VALUES ( :LI, :UI, :IP, :EID, :answer, NOW() )
-            ON DUPLICATE KEY UPDATE updated = NOW(), answer = :answer",
-            array(
-                ':LI' => $app['tsugi']->link->id,
-                ':UI' => $app['tsugi']->user->id,
-                ':IP' => Net::getIP(),
-                'EID' => $app['tsugi']->context->launch->ltiRawParameter('lis_person_sourcedid','none'),
-                ':answer' => $_POST['val']
-            )
-        );
-        // $app->tsugiFlashSuccess(__('Attendance Recorded...'));
-        return json_encode(['done' => 1, 'answer' => $_POST['val']]);
+        $result = '[]';
+        if ($app['config']["production"]) {
+            $result = '[
+                {"title": "Access Survey", "results": [{"t": "", "c": "green", "v": 6},{"t": "", "c": "orange", "v": 6}, {"t": "", "c": "red", "v": 6}]},
+                {"title": "Orientation", "results":  [{"t": "", "c": "green", "v": 6},{"t": "", "c": "orange", "v": 6}, {"t": "", "c": "red", "v": 6}]},
+                {"title": "Poll", "results":  [{"t": "", "c": "green", "v": 6},{"t": "", "c": "orange", "v": 6}, {"t": "", "c": "gray", "v": 6}]}
+            ]';    
+        }
+        // {"production":"","url":"https:\/\/api.server.com\/v.1.0\/","username":"username","password":"password"}
+
+        return new Response($result, 200, ['Content-Type' => 'application/json']);
+    }
+
+    public function getFile(Request $request, Application $app, $file = '') {
+        if (empty($file)) {
+            $app->abort(400);
+        }
+
+        switch (strtolower(pathinfo($file, PATHINFO_EXTENSION))) {
+            case 'css' : {
+                $contentType = 'text/css';
+                break;
+            }
+            case 'js' : {
+                $contentType = 'application/javascript';
+                break;
+            }
+            case 'xml' : {
+                $contentType = 'text/xml';
+                break;
+            }
+            case 'svg' : {
+                $contentType = 'image/svg+xml';
+                break;
+            }
+            default : {
+                $contentType = 'text/plain';
+            }
+        }
+
+        return new Response( file_get_contents( __DIR__ ."/../../static/". $file), 200, [ 
+            'Content-Type' => $contentType
+        ]);
     }
 }
