@@ -1,0 +1,45 @@
+{% extends "@Tsugi/Page.twig" %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{style}}"/>
+    <link rel="stylesheet" type="text/css" href="{{tooltip_css}}"/>
+    <script type="text/javascript">
+        Array.prototype.sum = function (prop) {
+            var total = 0
+            for ( var i = 0, _len = this.length; i < _len; i++ ) {
+                total += parseInt(this[i][prop]);
+            }
+            return total;
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <section id="graphs" class="result_container"></section>
+    <p id="last">&nbsp;</p>
+{% endblock %}
+
+{% block footer %}
+    {{ result | json_encode() }}
+    <script src="{{path}}/js/moment.min.js"></script>
+    <script src="{{tooltip_js}}"></script>
+    <script>
+    var data = [
+        {"title": "Access Survey", "results": [{"t": "", "c": "green", "v": 6},{"t": "", "c": "orange", "v": 6}, {"t": "", "c": "red", "v": 6}]},
+        {"title": "Orientation", "results":  [{"t": "", "c": "green", "v": 6},{"t": "", "c": "orange", "v": 6}, {"t": "", "c": "red", "v": 6}]},
+        {"title": "Poll", "results":  [{"t": "", "c": "green", "v": 6},{"t": "", "c": "orange", "v": 6}, {"t": "", "c": "gray", "v": 6}]}
+    ];
+
+    $(function() {
+        var save_timer = null,
+            clear_msg_timeout = null,
+            updated = {% if (selected.answer == "-1") %}false{% else %}true{% endif %};
+
+        $("#last").html(tmpl('tmpl-last-saved', {'updated' : '{{ selected.updated }}'}));
+        $("#graphs").html(tmpl('tmpl-graphs', data));
+        
+        $('.tt').tooltipster({ theme: 'tooltipster-borderless', distance: 0, animationDuration: 200, animation: 'grow'});
+    });
+    </script>
+    {{ source('tmpl.html', ignore_missing = true) }}
+{% endblock %}

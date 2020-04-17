@@ -1,0 +1,21 @@
+<script type="text/x-tmpl" id="tmpl-graphs">
+    {% $.each(o, function(e, el) { include('tmpl-graph-column', el); }); %}
+</script>
+<script type="text/x-tmpl" id="tmpl-graph-column">
+    <div id="item-0" class="item" data-title="{%=o.title%}">
+        {%  var total = o.results.sum('v');
+            $.each(o.results, function(e, el) { 
+                el.x = total;
+                include('tmpl-graph-line', el); 
+            }); 
+        %}
+    </div>
+</script>
+<script type="text/x-tmpl" id="tmpl-graph-line">
+    {% var p = (o.v / o.x) * 100; %}
+    <div class="item_{%=o.c%} tt" style="flex: {%=p%};" title="{%=(o.t != ''? o.t+": " : "")%}{%=Math.round(p, 2)%} % ({%=o.v%})"></div>
+</script>
+<script type="text/x-tmpl" id="tmpl-last-saved">
+    <i class="far fa-clock"></i>&nbsp;
+    {% if (o.updated != '') { %}Last updated: <span>{%=moment(o.updated).calendar()%}</span>{% } else { %}Last saved: <span>Never</span> {% } %}
+</script>
