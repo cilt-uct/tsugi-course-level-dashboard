@@ -16,12 +16,13 @@
 {% endblock %}
 
 {% block content %}
-    <h3 id="graphs-title">Course analytics</h3>
-    <!--label>Download results:</label>
-    <a href="https://srvslscet001.uct.ac.za/optout/downloadsurvey/hGZL0NElBSA=?t=1587385074" target="_blank" class="students_locations"> <i class="fa fa-file-csv"></i> CSV File </a-->
-    <br/>
-    <section id="graphs" class="result_container"></section>
-    <p id="last">&nbsp;</p>
+    <div id="graph_container">
+        <div id="title">
+            <h4>Course analytics</h4>
+        </div>
+        <section id="graphs" class="result_container"></section>
+        <p id="last">&nbsp;</p>
+    </div>
 {% endblock %}
 
 {% block footer %}
@@ -52,15 +53,23 @@
                 showState(0, true);
                 $.get('{{getUrl}}', function(_data) {
                     data = _data;
-                    //console.log(data);
+                    $('#title').html(tmpl('tmpl-link', _data));
+
                     if (_data.success == "1") {
+                        var orientation_updated = '';
+
+                        if (_data.orientation.length > 0) {
+                            var orientation_updated = new Date(Math.max.apply(null, _data.orientation.map(function(e) {
+                                return new Date(e.updated);
+                            })));
+                        }
                         
-                        $('#graphs-title').html('Course analytics for '+ data.title);
+                        $("#last").html(tmpl('tmpl-last-saved', {'participants': _data.no_students, 'updated' : orientation_updated }));
+
                         $("#graphs").html(tmpl('tmpl-graphs', _data));
-                        //$("#last").html(tmpl('tmpl-last-saved', {'participants': _data.total, 'updated' : _data.updated }));
-                        $("#last").html(tmpl('tmpl-last-saved', {'participants': data.total}));
                         $('.tt').tooltipster({ theme: 'tooltipster-borderless', distance: 0, animationDuration: 200, animation: 'grow'});
                     } else {
+                        $("#last").html(tmpl('tmpl-last-saved', {'participants': _data.no_students }));
                         showState(1);
                     }
                 }).fail(function() {

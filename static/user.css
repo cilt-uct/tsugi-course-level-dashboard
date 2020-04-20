@@ -13,8 +13,6 @@ section h3 {
 }
 
 .result_container {
-  padding-top: 25px;
-  margin: 30px 20px;
   display: flex;
   flex-wrap: nowrap;
   flex-direction: row;
@@ -22,6 +20,7 @@ section h3 {
   align-content: start;
   height: 320px;
   overflow-x: scroll;
+  padding: 40px 0px 0px;
 }
 
 .result_container #state {
@@ -76,9 +75,12 @@ section h3 {
   color: #848484;
   background-color: #fff;
   padding: 5px;
-  top: -30px;
   left: 0px;
   z-index: 0;
+  bottom: 100%;
+  left: 0px;
+  z-index: 0;
+  line-height: 20px;
 }
 
 .result_container > .item > div{
@@ -113,3 +115,25 @@ section h3 {
 #last > span {
   color: #999;
 }
+
+.navbar-fixed-top {
+  top: -200px;
+}
+
+#graph_container {
+  padding-top: 20px;
+  margin: 30px 20px;
+}
+
+/* 
+#graph_container {
+  border: 1px solid red;
+}
+
+#graph_container > * {
+  border: 1px solid blue;
+}
+
+#graph_container > h4 {
+  margin: 0;
+} */

@@ -1,28 +1,52 @@
+<script type="text/x-tmpl" id="tmpl-link">
+    <h4>
+        Course analytics for {%=o.title%}
+        {% if (o.no_students != '') { %}
+            <small>({%=o.no_students%} students)</small>
+        {% } %}
+        {% if (o.hash != '') { %}
+        <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=o.hash%}" 
+            target="_blank" 
+            style="float:right; font-weight: normal; font-size: 80%">
+            <i class="fas fa-external-link-alt"></i>
+            Student Access Survey
+        </a>
+        {% } %}
+    </h4>
+</script>
 <script type="text/x-tmpl" id="tmpl-graphs">
-    {%  $.each(o.cols, function(i, el) { 
-            el.total = o.total;
+    {%  
+        var cols = [],
+            orientation_arr = {
+                title: 'Way Forward Poll'
+                ,no_students: o.no_students
+                ,list: [{"t": "No response", "c": "gray", "v": o.total}]
+            }
+        if (o.orientation.length > 0) {
+            orientation_arr['list']= [
+                {"t": "Good", "c": "green", "v": o.orientation.filter((i) => i.answer == "1").length},
+                {"t": "Unsure", "c": "orange", "v": o.orientation.filter((i) => i.answer == "0").length}, 
+                {"t": "No response", "c": "gray", "v": o.no_students - o.orientation.length}
+            ];
+            cols.push(orientation_arr);
+        }
+        console.log(cols); 
+        $.each(cols, function(i, el) { 
             el.i = i;
             include('tmpl-graph-column', el); 
         }); %}
 </script>
 <script type="text/x-tmpl" id="tmpl-graph-column">
+    {% console.log(o); %}
     <div id="item-{%=o.i%}" class="item" data-title="{%=o.title%}">
-        {%  var arr = [
-            {"t": "Good", "c": "green", "v": o.results.filter((i) => i.answer == "1").length},
-            {"t": "Unsure", "c": "orange", "v": o.results.filter((i) => i.answer == "0").length}, 
-            {"t": "No response", "c": "gray", "v": o.results.filter((i) => i.answer == "-1").length}
-        ];
-        if (o.results.length == 0) {
-            arr = [{"t": "No response", "c": "gray", "v": o.total}];
-        }
-    $.each(arr, function(e, el) { 
-        el.x = o.total;
-        include('tmpl-graph-line', el); 
-    }); 
-%}
+        {%  $.each(o.list, function(e, el) { 
+            el.x = o.no_students;
+            include('tmpl-graph-line', el); 
+        }); %}
     </div>
 </script>
 <script type="text/x-tmpl" id="tmpl-graph-line">
+    {% console.log(o); %}
     {% var p = o.x == 0 ? 1 : (o.v / o.x) * 100; %}
     <div class="item_{%=o.c%} tt" style="flex: {%=p%};" title="{%=(o.t != ''? o.t+": " : "")%}{%=Math.round(p, 2)%} % ({%=o.v%})"></div>
 </script>
@@ -31,7 +55,7 @@
     Students: <span>{%=o.participants%}</span>
     &nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;
     <i class="far fa-clock"></i>&nbsp;
-    {% if (o.updated != '') { %}Last updated: <span>{%=moment(o.updated).calendar()%}</span>{% } else { %}Last saved: <span>Never</span> {% } %}
+    {% if (o.updated != '') { %}Last updated: <span>{%=moment(o.updated).calendar()%}</span>{% } else { %}Last updated: <span>Never</span> {% } %}
 </script>
 <script type="text/x-tmpl" id="tmpl-state">
 <div id="state" class="fa-3x">
