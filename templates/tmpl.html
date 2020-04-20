@@ -1,18 +1,29 @@
 <script type="text/x-tmpl" id="tmpl-graphs">
-    {% $.each(o, function(e, el) { include('tmpl-graph-column', el); }); %}
+    {%  $.each(o.cols, function(i, el) { 
+            el.total = o.total;
+            el.i = i;
+            include('tmpl-graph-column', el); 
+        }); %}
 </script>
 <script type="text/x-tmpl" id="tmpl-graph-column">
-    <div id="item-0" class="item" data-title="{%=o.title%}">
-        {%  var total = o.results.sum('v');
-            $.each(o.results, function(e, el) { 
-                el.x = total;
-                include('tmpl-graph-line', el); 
-            }); 
-        %}
+    <div id="item-{%=o.i%}" class="item" data-title="{%=o.title%}">
+        {%  var arr = [
+            {"t": "Good", "c": "green", "v": o.results.filter((i) => i.answer == "1").length},
+            {"t": "Unsure", "c": "orange", "v": o.results.filter((i) => i.answer == "0").length}, 
+            {"t": "No response", "c": "gray", "v": o.results.filter((i) => i.answer == "-1").length}
+        ];
+        if (o.results.length == 0) {
+            arr = [{"t": "No response", "c": "gray", "v": o.total}];
+        }
+    $.each(arr, function(e, el) { 
+        el.x = o.total;
+        include('tmpl-graph-line', el); 
+    }); 
+%}
     </div>
 </script>
 <script type="text/x-tmpl" id="tmpl-graph-line">
-    {% var p = (o.v / o.x) * 100; %}
+    {% var p = o.x == 0 ? 1 : (o.v / o.x) * 100; %}
     <div class="item_{%=o.c%} tt" style="flex: {%=p%};" title="{%=(o.t != ''? o.t+": " : "")%}{%=Math.round(p, 2)%} % ({%=o.v%})"></div>
 </script>
 <script type="text/x-tmpl" id="tmpl-last-saved">

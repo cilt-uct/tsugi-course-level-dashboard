@@ -16,6 +16,10 @@
 {% endblock %}
 
 {% block content %}
+    <h3 id="graphs-title">Course analytics</h3>
+    <!--label>Download results:</label>
+    <a href="https://srvslscet001.uct.ac.za/optout/downloadsurvey/hGZL0NElBSA=?t=1587385074" target="_blank" class="students_locations"> <i class="fa fa-file-csv"></i> CSV File </a-->
+    <br/>
     <section id="graphs" class="result_container"></section>
     <p id="last">&nbsp;</p>
 {% endblock %}
@@ -48,10 +52,13 @@
                 showState(0, true);
                 $.get('{{getUrl}}', function(_data) {
                     data = _data;
-                    console.log(data);
+                    //console.log(data);
                     if (_data.success == "1") {
-                        $("#graphs").html(tmpl('tmpl-graphs', _data.results));
-                        $("#last").html(tmpl('tmpl-last-saved', {'participants': _data.total, 'updated' : _data.updated }));
+                        
+                        $('#graphs-title').html('Course analytics for '+ data.title);
+                        $("#graphs").html(tmpl('tmpl-graphs', _data));
+                        //$("#last").html(tmpl('tmpl-last-saved', {'participants': _data.total, 'updated' : _data.updated }));
+                        $("#last").html(tmpl('tmpl-last-saved', {'participants': data.total}));
                         $('.tt').tooltipster({ theme: 'tooltipster-borderless', distance: 0, animationDuration: 200, animation: 'grow'});
                     } else {
                         showState(1);

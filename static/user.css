@@ -89,15 +89,15 @@ section h3 {
 }
 
 .item_green {
-  background: #9BCA3E;
+  background: #8bc34a;/*#9BCA3E;*/
 }
 
 .item_orange {
-  background: #FFB92A;
+  background: #ff9800;/*#FFB92A;*/
 }
 
 .item_red {
-  background: #D81A1A;
+  background: #F44336;/*#D81A1A;*/
 }
 
 .item_gray {
