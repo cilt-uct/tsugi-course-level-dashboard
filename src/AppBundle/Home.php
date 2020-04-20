@@ -79,8 +79,8 @@ class Home {
         // {"production":"","url":"https:\/\/api.server.com\/v.1.0\/","username":"username","password":"password"}
         // if ($app['config']["production"])
             
-            //$poll = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site='. $app['tsugi']->context->launch->ltiRawParameter('context_id','none')));
-            $poll = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site=2dda0bd3-9100-4034-a404-ff0e34b1887c') );
+            $poll = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site='. $app['tsugi']->context->launch->ltiRawParameter('context_id','none')));
+            //$poll = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site=2dda0bd3-9100-4034-a404-ff0e34b1887c') );
             //$poll = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site=4f6abcc6-84f1-4c5c-9df2-08712ea669df'));
 
             // $arr_4 = '[{"t": "Good", "c": "green", "v": 0},{"t": "Unsure", "c": "orange", "v": 0}, {"t": "Bad", "c": "red", "v": 0}, {"t": "Unknown", "c": "red", "v": 0}]';
