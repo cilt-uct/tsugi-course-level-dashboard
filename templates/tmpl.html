@@ -12,17 +12,17 @@
             var h = Object.entries(o.hash[0])[0]; %}
         <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=h[1]%}" 
             target="_blank" 
-            style="font-weight: normal; font-size: 80%">
+            style="font-weight: normal;">
             <i class="fas fa-external-link-alt"></i>
             Student Access Survey results <span style="color: #333;"> (includes orientation poll in CSV download)</span>
         </a>
         {% } else { %}
-            <label style="font-size: 80%">Student Access Survey results:</label>
+            <label>Student Access Survey results:</label>
             {% $.each(o.hash, function (k, v) { 
                 var h = Object.entries(v)[0]; %}
                 <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=h[1]%}" 
                     target="_blank" 
-                    style="font-weight: normal; font-size: 80%; padding-left: 10px;">
+                    style="font-weight: normal; padding-left: 10px;">
                     <i class="fas fa-external-link-alt"></i>
                     {%=h[0]%}
                 </a>
