@@ -11,7 +11,7 @@
             target="_blank" 
             style="font-weight: normal; font-size: 80%">
             <i class="fas fa-external-link-alt"></i>
-            Student Access Survey results
+            Student Access Survey results <small style="color: #848484;">(includes orientation poll)</small>
         </a>
     </div>
     {% } %}
@@ -44,14 +44,22 @@
                 ,no_students: o.no_students
                 ,list: [{"t": "No data", "c": "empty", "v": o.no_students}]
             }
-
+            
+        if (o.survey.length > 0) {
+            survey_arr['list']= [
+                {"t": "Good", "c": "green", "v": data.survey.filter((i) => i.val == "GREEN").length},
+                {"t": "Uncertain", "c": "orange", "v": data.survey.filter((i) => i.val == "ORANGE").length}, 
+                {"t": "Unlikely", "c": "red", "v": data.survey.filter((i) => i.val == "RED").length},
+                {"t": "Unknown", "c": "gray", "v": o.no_students - o.survey.length}
+            ];
+        }
+        
         if (o.orientation.length > 0) {
             orientation_arr['list']= [
-                {"t": "Good", "c": "green", "v": o.orientation.filter((i) => i.answer == "1").length},
-                {"t": "Unsure", "c": "orange", "v": o.orientation.filter((i) => i.answer == "0").length}, 
+                {"t": "Good", "c": "green", "v": o.orientation.filter((i) => i.val == "1").length},
+                {"t": "Unsure", "c": "orange", "v": o.orientation.filter((i) => i.val == "0").length}, 
                 {"t": "No response", "c": "gray", "v": o.no_students - o.orientation.length}
             ];
-            
         }
         
         cols.push(survey_arr);
@@ -59,7 +67,7 @@
         cols.push(orientation_arr);
         cols.push(Week1);
         cols.push(Week2);
-        console.log(cols);
+        /* console.log(cols); */
 
         $.each(cols, function(i, el) { 
             el.i = i;
@@ -67,7 +75,7 @@
         }); %}
 </script>
 <script type="text/x-tmpl" id="tmpl-graph-column">
-    {% console.log(o); %}
+    {% /* console.log(o); */ %}
     <div id="item-{%=o.i%}" class="item" data-title="{%=o.title%}">
         {%  $.each(o.list, function(e, el) { 
             el.x = o.no_students;
@@ -83,9 +91,10 @@
 </script>
 <script type="text/x-tmpl" id="tmpl-last-saved">
     <div>
-        <div class="red">Unlikely to be able to participate effectively in remote learning</div>
-        <div class="orange">Substantial uncertainty about ability to participate effectively in remote learning</div>
         <div class="green">Likely to be able to participate effectively in remote learning</div>
+        <div class="orange">Substantial uncertainty about ability to participate effectively in remote learning</div>
+        <div class="red">Unlikely to be able to participate effectively in remote learning</div>
+        <div class="gray">Did not participate in the survey or poll, no data for this student</div>
     </div>
     <div>
         <div>

@@ -124,11 +124,11 @@ section h3 {
   color: #999;
 }
 
-#last .red, #last .orange , #last .green {
+#last .red, #last .orange , #last .green, #last .gray {
   position: relative;
 }
 
-#last .red:before, #last .orange:before , #last .green:before {
+#last .red:before, #last .orange:before , #last .green:before, #last .gray:before {
   content: "";
   width: 16px;
   height: 20px;
@@ -150,13 +150,16 @@ section h3 {
   background: #F44336;/*#D81A1A;*/
 }
 
+#last .gray:before {
+  background: #E6E6E6;/*#D81A1A;*/
+}
+
 .navbar-fixed-top {
   top: -200px;
 }
 
 #graph_container {
-  padding-top: 20px;
-  margin: 30px 20px;
+  margin: 20px;
 }
 
 /* 
