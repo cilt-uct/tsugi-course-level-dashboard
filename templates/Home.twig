@@ -21,7 +21,7 @@
             <h4>Course analytics</h4>
         </div>
         <section id="graphs" class="result_container"></section>
-        <p id="last">&nbsp;</p>
+        <div id="last">&nbsp;</div>
     </div>
 {% endblock %}
 
@@ -64,7 +64,7 @@
                             })));
                         }
                         
-                        $("#last").html(tmpl('tmpl-last-saved', {'participants': _data.no_students, 'updated' : orientation_updated }));
+                        $("#last").html(tmpl('tmpl-last-saved', {'students': _data.no_students, 'updated' : orientation_updated }));
 
                         $("#graphs").html(tmpl('tmpl-graphs', _data));
                         $('.tt').tooltipster({ theme: 'tooltipster-borderless', distance: 0, animationDuration: 200, animation: 'grow'});

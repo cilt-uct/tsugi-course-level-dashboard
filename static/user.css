@@ -70,7 +70,7 @@ section h3 {
 .result_container > .item:before {
   content: attr(data-title);
   position: absolute;
-  font-size: 1.2rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #848484;
   background-color: #fff;
@@ -106,7 +106,15 @@ section h3 {
   background: #E6E6E6;
 }
 
+.item_empty {
+  background: #FEFEFE;
+  border: 1px dashed #E6E6E6;
+}
+
 #last {
+  display: flex;
+  justify-content: space-between;
+
   color: #bbb;
   font-size: 0.8rem;
   margin: 10px 20px 0px;
@@ -114,6 +122,32 @@ section h3 {
 
 #last > span {
   color: #999;
+}
+
+#last .red, #last .orange , #last .green {
+  position: relative;
+}
+
+#last .red:before, #last .orange:before , #last .green:before {
+  content: "";
+  width: 16px;
+  height: 20px;
+  display: block;
+  position: absolute;
+  left: -20px;
+  top: 3px;
+}
+
+#last .green:before {
+  background: #8bc34a;/*#9BCA3E;*/
+}
+
+#last .orange:before {
+  background: #ff9800;/*#FFB92A;*/
+}
+
+#last .red:before {
+  background: #F44336;/*#D81A1A;*/
 }
 
 .navbar-fixed-top {
