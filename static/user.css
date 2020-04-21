@@ -115,14 +115,11 @@ section h3 {
   display: flex;
   justify-content: space-between;
 
-  color: #bbb;
+  color: #333;
   font-size: 0.8rem;
   margin: 10px 20px 0px;
 }
 
-#last > span {
-  color: #999;
-}
 
 #last .red, #last .orange , #last .green, #last .gray {
   position: relative;
