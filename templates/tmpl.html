@@ -2,17 +2,32 @@
     <h4>
         Course Analytics for {%=o.title%}
         {% if (o.no_students != '') { %}
-            <small>({%=o.no_students%} students)</small>
+            <span>({%=formatNumber(o.no_students)%} students)</span>
         {% } %}
     </h4>
-    {% if (o.hash != '') { %}
+    {% if (o.hash.length > 0) { %}
     <div>
-        <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=o.hash%}" 
+        {% console.log(o.hash); %}
+        {% if (o.hash.length == 1) { 
+            var h = Object.entries(o.hash[0])[0]; %}
+        <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=h[1]%}" 
             target="_blank" 
             style="font-weight: normal; font-size: 80%">
             <i class="fas fa-external-link-alt"></i>
-            Student Access Survey results <small style="color: #333;">(includes orientation poll)</small>
+            Student Access Survey results <span style="color: #333;"> (includes orientation poll in CSV download)</span>
         </a>
+        {% } else { %}
+            <label style="font-size: 80%">Student Access Survey results:</label>
+            {% $.each(o.hash, function (k, v) { 
+                var h = Object.entries(v)[0]; %}
+                <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=h[1]%}" 
+                    target="_blank" 
+                    style="font-weight: normal; font-size: 80%; padding-left: 10px;">
+                    <i class="fas fa-external-link-alt"></i>
+                    {%=h[0]%}
+                </a>
+            {% }); %}
+        {% } %}
     </div>
     {% } %}
 </script>
@@ -22,12 +37,12 @@
             survey_arr = {
                 title: 'Access Survey'
                 ,no_students: o.no_students
-                ,list: [{"t": "No data", "c": "empty", "v": o.no_students}]
+                ,list: [{"t": "No data yet", "c": "empty", "v": o.no_students}]
             },
             activity_arr = {
                 title: 'Orientation Activity'
                 ,no_students: o.no_students
-                ,list: [{"t": "No data", "c": "empty", "v": o.no_students}]
+                ,list: [{"t": "No data yet", "c": "empty", "v": o.no_students}]
             },
             orientation_arr = {
                 title: 'Orientation Poll'
@@ -37,12 +52,12 @@
             Week1 = {
                 title: 'Week 1 Activity'
                 ,no_students: o.no_students
-                ,list: [{"t": "No data", "c": "empty", "v": o.no_students}]
+                ,list: [{"t": "No data yet", "c": "empty", "v": o.no_students}]
             },
             Week2 = {
                 title: 'Week 2 Activity'
                 ,no_students: o.no_students
-                ,list: [{"t": "No data", "c": "empty", "v": o.no_students}]
+                ,list: [{"t": "No data yet", "c": "empty", "v": o.no_students}]
             }
             
         if (o.survey.length > 0) {
@@ -84,7 +99,7 @@
     </div>
 </script>
 <script type="text/x-tmpl" id="tmpl-graph-line">
-    {% console.log(o); %}
+    {% /* console.log(o); */ %}
     {% var p = o.x == 0 ? 1 : (o.v / o.x) * 100; %}
     <div class="item_{%=o.c%} tt" style="flex: {%=p%};" 
         title="{% if(o.c != 'empty') { %}{%=(o.t != ''? o.t+": " : "")%}{%=Math.round(p, 2)%} % ({%=o.v%})"{% } else { %}{%=o.t%}{% } %}""></div>
