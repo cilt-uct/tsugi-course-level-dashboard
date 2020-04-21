@@ -73,36 +73,14 @@ class Home {
     }
 
     public function getInfo(Request $request, Application $app) {
+        $result = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site='. $app['tsugi']->context->launch->ltiRawParameter('context_id','none')));
 
-        $result = array("success" => 0);
+        // Testing sites: 
+        // $result = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site=2dda0bd3-9100-4034-a404-ff0e34b1887c')); // MAM1000W (2020)
+        // $result = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site=1f718456-7261-43b4-8e40-1dfbf8bdce23')); // PACA Orientation
+        // $result = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site=4f6abcc6-84f1-4c5c-9df2-08712ea669df')); // CILT LT Team - Dev
 
-        // {"production":"","url":"https:\/\/api.server.com\/v.1.0\/","username":"username","password":"password"}
-        // if ($app['config']["production"])
-            
-            $poll = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site='. $app['tsugi']->context->launch->ltiRawParameter('context_id','none')));
-            //$poll = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site=2dda0bd3-9100-4034-a404-ff0e34b1887c') );
-            //$poll = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site=4f6abcc6-84f1-4c5c-9df2-08712ea669df'));
-
-            // $arr_4 = '[{"t": "Good", "c": "green", "v": 0},{"t": "Unsure", "c": "orange", "v": 0}, {"t": "Bad", "c": "red", "v": 0}, {"t": "Unknown", "c": "red", "v": 0}]';
-            // $arr_3 = '[{"t": "Good", "c": "green", "v": 0},{"t": "Unsure", "c": "orange", "v": 0}, {"t": "No response", "c": "gray", "v": 0}]';
-
-            // $result = array("total" => $poll->total
-            //                 ,"success" => 1
-            //                 ,"title" => $poll->title
-            //                 ,"site" => $app['tsugi']->context->launch->ltiRawParameter('context_id','none')
-            //                 ,"updated"=> (new DateTime())->format('Y-m-d H:i:s'));
-            // // {"total":762,"success":1,"title":"MAM1000W (2020)","updated":"2020-04-20 14:50:12","cols":[{"title":"Poll","results":null}]}
-            // $result["cols"] = array(
-            //                         array("title" => "Poll", "results" => $poll->result)
-            //                         // $this->getValues("Access Survey", $result['total'], json_decode($arr_4)),
-            //                         // $this->getValues("Orientation", $result['total'], json_decode($arr_4)),
-            //                         // $this->getValues("Poll", $result['total'], json_decode($arr_3)),
-            //                         // $this->getValues("Week 1", $result['total'], json_decode($arr_4)),
-            //                         // $this->getValues("Week 2", $result['total'], json_decode($arr_4))
-                                // );
-        // }
-
-        return new Response(json_encode($poll), 200, ['Content-Type' => 'application/json']);
+        return new Response(json_encode($result), 200, ['Content-Type' => 'application/json']);
     }
 
     public function getFile(Request $request, Application $app, $file = '') {

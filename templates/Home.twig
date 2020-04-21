@@ -12,10 +12,14 @@
             }
             return total;
         }
+        function formatNumber(num) {
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ')
+        }
     </script>
 {% endblock %}
 
 {% block content %}
+{% if app.tsugi.user.instructor %}
     <div id="graph_container">
         <div id="title">
             <h4>Course Analytics</h4>
@@ -23,17 +27,16 @@
         <section id="graphs" class="result_container"></section>
         <div id="last">&nbsp;</div>
     </div>
+{% endif %}
 {% endblock %}
 
 {% block footer %}
-{% for script in scripts %}
-    <script src="{{script}}" type="text/javascript"></script>
-{% endfor %}
+{% if app.tsugi.user.instructor %}
+    {% for script in scripts %}
+        <script src="{{script}}" type="text/javascript"></script>
+    {% endfor %}
     <script>
-    function formatNumber(num) {
-        return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1 ')
-    }
-    
+
     var data = [];
     $(function() {
 
@@ -90,4 +93,5 @@
     });
     </script>
     {{ source('tmpl.html', ignore_missing = true) }}
+{% endif %}
 {% endblock %}
