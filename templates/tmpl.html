@@ -5,9 +5,8 @@
             <span>({%=formatNumber(o.no_students)%} students)</span>
         {% } %}
     </h4>
-    {% if (o.hash.length > 0) { %}
+    {% if (o.hash) { if (o.hash.length > 0) { %}
     <div>
-        {% console.log(o.hash); %}
         {% if (o.hash.length == 1) { 
             var h = Object.entries(o.hash[0])[0]; %}
         <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=h[1]%}" 
@@ -29,7 +28,7 @@
             {% }); %}
         {% } %}
     </div>
-    {% } %}
+    {% } } %}
 </script>
 <script type="text/x-tmpl" id="tmpl-graphs">
     {%  
