@@ -79,7 +79,7 @@
         if (o.orientation_activity.length > 0) {
             activity_arr['list']= [
                 {"t": "Logged In", "c": "blue", "v": o.orientation_activity.sum('val')},
-                {"t": "No response", "c": "gray", "v": o.no_students - o.orientation_activity.sum('val')}
+                {"t": "Has not logged in", "c": "gray", "v": o.no_students - o.orientation_activity.sum('val')}
             ];
         }
         
