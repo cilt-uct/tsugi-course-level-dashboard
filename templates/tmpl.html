@@ -75,6 +75,13 @@
                 {"t": "No response", "c": "gray", "v": o.no_students - o.orientation.length}
             ];
         }
+
+        if (o.orientation_activity.length > 0) {
+            activity_arr['list']= [
+                {"t": "Logged In", "c": "blue", "v": o.orientation_activity.length},
+                {"t": "No response", "c": "gray", "v": o.no_students - o.orientation.length}
+            ];
+        }
         
         cols.push(survey_arr);
         cols.push(activity_arr);

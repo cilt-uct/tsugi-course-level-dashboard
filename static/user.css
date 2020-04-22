@@ -102,6 +102,10 @@ section h3 {
   background: #F44336;/*#D81A1A;*/
 }
 
+.item_blue {
+  background: #4A8BC3;/*#D81A1A;*/
+}
+
 .item_gray {
   background: #E6E6E6;
 }
@@ -121,7 +125,7 @@ section h3 {
 }
 
 
-#last .red, #last .orange , #last .green, #last .gray {
+#last .red, #last .orange , #last .green, #last .gray, #last .blue {
   position: relative;
 }
 
@@ -145,6 +149,10 @@ section h3 {
 
 #last .red:before {
   background: #F44336;/*#D81A1A;*/
+}
+
+#last .blue:before {
+  background: #4A8BC3;/*#D81A1A;*/
 }
 
 #last .gray:before {
