@@ -129,7 +129,7 @@ section h3 {
   position: relative;
 }
 
-#last .red:before, #last .orange:before , #last .green:before, #last .gray:before {
+#last .red:before, #last .orange:before , #last .green:before, #last .blue:before, #last .gray:before {
   content: "";
   width: 16px;
   height: 20px;
