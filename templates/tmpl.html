@@ -3,7 +3,7 @@
         Course Analytics for {%=o.title%}
         {% if (o.no_students != '') { %}
             <span>({%=formatNumber(o.no_students)%} students)</span>
-        {% } %}
+        {% } %}        
     </h4>
     {% if (o.hash) { if (o.hash.length > 0) { %}
     <div>
@@ -13,7 +13,7 @@
             target="_blank" 
             style="font-weight: normal;">
             <i class="fas fa-external-link-alt"></i>
-            Student Access Survey results <span style="color: #333;"> (includes orientation poll in CSV download)</span>
+            Student Access Survey results <span style="color: #333;"> (includes orientation activity and poll in CSV download)</span>
         </a>
         {% } else { %}
             <label>Student Access Survey results:</label>
@@ -27,6 +27,14 @@
                 </a>
             {% }); %}
         {% } %}
+    </div>
+    <div>
+        <a target="_blank" 
+            href="https://docs.google.com/document/d/1x-RExML5xfAi6NcQeia5HfzJq-Qq8uQzZSqO8ofNogQ/edit?usp=sharing"
+            style="font-weight: normal;">
+            <i class="fas fa-info-circle"></i>
+            About Course Analytics <span style="color: #333;"> (including category definitions)</span>
+        </a>
     </div>
     {% } } %}
 </script>
@@ -78,9 +86,12 @@
 
         if (o.orientation_activity.length > 0) {
             activity_arr['list']= [
-                {"t": "Logged in to Vula", "c": "blue", "v": o.orientation_activity.sum('val')},
-                {"t": "Has not logged in", "c": "gray", "v": o.no_students - o.orientation_activity.sum('val')}
+                //{"t": "Logged in to Vula", "c": "blue", "v": o.orientation_activity.sum('val')},
+                {"t": "Viewed orientation lessons on a laptop, desktop or tablet", "c": "green", "v": data.orientation_activity.filter((i) => i.val == "GREEN").length},
+                {"t": "Logged in to Vula but limited or no activity on orientation site, and/or accessed Vula only from a smartphone", "c": "orange", "v": data.orientation_activity.filter((i) => i.val == "ORANGE").length}, 
+                {"t": "Has not logged in", "c": (new Date() < new Date(o.orientation_activity_end_date) ? "gray" : "red"), "v": o.no_students - o.orientation_activity.length}
             ];
+            // orientation switches to red after a certain date (orientation_activity_end_date)
         }
         
         cols.push(survey_arr);
