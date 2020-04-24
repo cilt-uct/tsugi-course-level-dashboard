@@ -68,15 +68,13 @@
                     $('#title').html(tmpl('tmpl-link', _data));
 
                     if (_data.success == "1") {
-                        var orientation_updated = '';
+                        var orientation_updated = _data.orientation.length > 0 ? new Date(Math.max.apply(null, _data.orientation.map(function(e) { return new Date(e.updated); }))) : '', 
+                            o_activity_updated = _data.orientation_activity.length > 0 ? new Date(Math.max.apply(null, _data.orientation_activity.map(function(e) { return new Date(e.updated); }))) : '', 
+                            survey_updated = _data.survey.length > 0 ? new Date(Math.max.apply(null, _data.survey.map(function(e) { return new Date(e.updated); }))) : '';
 
-                        if (_data.orientation.length > 0) {
-                            var orientation_updated = new Date(Math.max.apply(null, _data.orientation.map(function(e) {
-                                return new Date(e.updated);
-                            })));
-                        }
+                        var updated = new Date(Math.max(orientation_updated, o_activity_updated, survey_updated));
                         
-                        $("#last").html(tmpl('tmpl-last-saved', {'students': _data.no_students, 'updated' : orientation_updated }));
+                        $("#last").html(tmpl('tmpl-last-saved', {'students': _data.no_students, 'updated' : updated }));
 
                         $("#graphs").html(tmpl('tmpl-graphs', _data));
                         $('.tt').tooltipster({ theme: 'tooltipster-borderless', maxWidth: 300, distance: 0, animationDuration: 200, animation: 'grow'});
