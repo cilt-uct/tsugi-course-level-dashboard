@@ -93,6 +93,14 @@
             ];
             // orientation switches to red after a certain date (orientation_activity_end_date)
         }
+
+        if (o.week_1.length > 0) {
+            var r = o.week_1.sum('val');
+            Week1['list']= [
+                {"t": "Logged in to Vula", "c": "blue", "v": r},
+                {"t": "Has not logged in", "c": "gray", "v": o.no_students - r}
+            ];
+        }        
         
         cols.push(survey_arr);
         cols.push(activity_arr);
@@ -126,7 +134,7 @@
         <div class="green">Likely to be able to participate effectively in remote learning</div>
         <div class="orange">Substantial uncertainty about ability to participate effectively in remote learning</div>
         <div class="red">Unlikely to be able to participate effectively in remote learning</div>
-        <!-- <div class="blue">Logged in to Vula in the time period</div> -->
+        <div class="blue">Logged in to Vula in the time period</div>
         <div class="gray">Did not participate in the survey or poll, not logged in yet or no data for this student</div>
     </div>
     <div>
