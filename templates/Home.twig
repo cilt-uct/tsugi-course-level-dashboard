@@ -43,6 +43,32 @@
     <script>
 
     var data = [];
+
+    function getWeekData (no, no_students, w) {
+        var result = {
+                title: 'Week '+ no +' Activity'
+                ,no_students: no_students
+                ,list: [{"t": "No data yet", "c": "empty", "v": no_students}]
+            };
+
+        if ('list' in w) {
+            if (w.list.length > 0) {
+                if (new Date() >= new Date(w.start)) {
+                    var r = w.list.length;
+                    result['list'] = [];
+                    if (new Date() < new Date(w.active)) {
+                        result['list'].push({"t": "Logged in to Vula", "c": "blue", "v": r});
+                    } else {
+                        result['list'].push({"t": "Viewed orientation lessons on a laptop, desktop or tablet", "c": "green", "v": w.list.filter((i) => i.val == "GREEN").length});
+                        result['list'].push({"t": "Logged in to Vula but limited or no activity on orientation site, and/or accessed Vula only from a smartphone", "c": "orange", "v": w.list.filter((i) => i.val == "ORANGE").length});
+                    }
+                    result['list'].push({"t": "Has not logged in", "c": (new Date() < new Date(w.end) ? "gray" : "red"), "v": no_students - r});
+                }
+            }
+        } 
+        return result;  
+    }
+
     $(function() {
 
         var 
