@@ -59,8 +59,8 @@
                     if (new Date() < new Date(w.active)) {
                         result['list'].push({"t": "Logged in to Vula", "c": "blue", "v": r});
                     } else {
-                        result['list'].push({"t": "Viewed orientation lessons on a laptop, desktop or tablet", "c": "green", "v": w.list.filter((i) => i.val == "GREEN").length});
-                        result['list'].push({"t": "Logged in to Vula but limited or no activity on orientation site, and/or accessed Vula only from a smartphone", "c": "orange", "v": w.list.filter((i) => i.val == "ORANGE").length});
+                        result['list'].push({"t": "Active engagement in 2 or more course sites over 2 or more days", "c": "green", "v": w.list.filter((i) => i.val == "GREEN").length});
+                        result['list'].push({"t": "Logged in to Vula but limited or no activity, and/or accessed Vula only from a smartphone", "c": "orange", "v": w.list.filter((i) => i.val == "ORANGE").length});
                     }
                     result['list'].push({"t": "Has not logged in", "c": (new Date() < new Date(w.end) ? "gray" : "red"), "v": no_students - r});
                 }
