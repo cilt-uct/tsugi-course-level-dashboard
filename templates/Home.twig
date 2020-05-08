@@ -24,7 +24,7 @@
 {% block content %}
 {% if app.tsugi.user.instructor %}
     <div id="graph_container">
-        <div id="title">
+        <div id="title" data-url="{{downloadUrl}}">
             <h4>Course Analytics</h4>
         </div>
         <section id="graphs" class="result_container"></section>
@@ -71,19 +71,20 @@
 
     $(function() {
 
-        var 
-            showState = function(_state, instant) {
+        var error_count = 0,
+            showState = function(_state, instant, err) {
                 _state = _state || 0;
                 instant = instant || false;
+                console.log(err);
                 if (instant) {
-                    $("#graphs").html(tmpl('tmpl-state', {state: _state, svg: '{{loader_svg}}'}));
+                    $("#graphs").html(tmpl('tmpl-state', {state: _state, err: err, c: error_count, svg: '{{loader_svg}}'}));
                 } else {
                     if ($('#state:visible').length) {
                         $('#state').fadeOut(350, function() {
-                        showState(_state);
+                        showState(_state, instant, err);
                         });
                     } else {
-                        $("#graphs").hide().html(tmpl('tmpl-state', {state: _state, svg: '{{loader_svg}}'})).fadeIn(300);
+                        $("#graphs").hide().html(tmpl('tmpl-state', {state: _state,  err: err, c: error_count, svg: '{{loader_svg}}'})).fadeIn(300);
                     }
                 }
             },
@@ -91,6 +92,7 @@
                 showState(0, true);
                 $.get('{{getUrl}}', function(_data) {
                     data = _data;
+                    _data['download'] = $('#title').data('url');
                     $('#title').html(tmpl('tmpl-link', _data));
 
                     if (_data.success == "1") {
@@ -115,15 +117,16 @@
                         $('.tt').tooltipster({ theme: 'tooltipster-borderless', maxWidth: 300, distance: 0, animationDuration: 200, animation: 'grow'});
                     } else {
                         $("#last").html(tmpl('tmpl-last-saved', {'students': 'NA', 'updated' : '' }))
-                        showState(1);
+                        showState(1, false, _data['err']);
                     }
                 }).fail(function() {
                     showState(2);
                 });
             };
 
-        $("#graphs").on("click","#state a", function(event) {
+        $("#graphs").on("click","#state a.reload", function(event) {
             event.preventDefault();
+            error_count ++;
             init();
         });
 

@@ -1,41 +1,54 @@
 <script type="text/x-tmpl" id="tmpl-link">
     <h4>
-        Course Analytics for {%=o.title%}
-        {% if (o.no_students != '') { %}
+        Course Analytics {%=(o.title != undefined ? 'for '+ o.title : '')%}
+        {% if ((o.no_students != '') & (o.no_students != undefined)) { %}
             <span>({%=formatNumber(o.no_students)%} students)</span>
-        {% } %}        
+        {% } %}
     </h4>
-    {% if (o.hash) { if (o.hash.length > 0) { %}
-    <div>
-        {% if (o.hash.length == 1) { 
-            var h = Object.entries(o.hash[0])[0]; %}
-        <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=h[1]%}" 
-            target="_blank" 
-            style="font-weight: normal;">
-            <i class="fas fa-external-link-alt"></i>
-            Student Access Survey results <span style="color: #333;"> (includes orientation activity and poll in CSV download)</span>
-        </a>
-        {% } else { %}
-            <label>Student Access Survey results:</label>
-            {% $.each(o.hash, function (k, v) { 
-                var h = Object.entries(v)[0]; %}
+    
+    <div class="subheading">
+        <div>
+            {% if (o.hash) { if (o.hash.length > 0) { %}
+            <div>
+                {% if (o.hash.length == 1) { 
+                    var h = Object.entries(o.hash[0])[0]; %}
                 <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=h[1]%}" 
                     target="_blank" 
-                    style="font-weight: normal; padding-left: 10px;">
+                    style="font-weight: normal;">
                     <i class="fas fa-external-link-alt"></i>
-                    {%=h[0]%}
+                    Student Access Survey results <span style="color: #333;"> (includes orientation activity and poll in CSV download)</span>
                 </a>
-            {% }); %}
-        {% } %}
-    </div>
-    {% } } %}
-    <div>
-        <a target="_blank" 
-            href="https://docs.google.com/document/d/1x-RExML5xfAi6NcQeia5HfzJq-Qq8uQzZSqO8ofNogQ/edit?usp=sharing"
-            style="font-weight: normal;">
-            <i class="fas fa-info-circle"></i>
-            About Course Analytics <span style="color: #333;"> (including category definitions)</span>
-        </a>
+                {% } else { %}
+                    <label>Student Access Survey results:</label>
+                    {% $.each(o.hash, function (k, v) { 
+                        var h = Object.entries(v)[0]; %}
+                        <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=h[1]%}" 
+                            target="_blank" 
+                            style="font-weight: normal; padding-left: 10px;">
+                            <i class="fas fa-external-link-alt"></i>
+                            {%=h[0]%}
+                        </a>
+                    {% }); %}
+                {% } %}
+            </div>
+            {% } } %}
+            <div>
+                <a target="_blank" 
+                    href="https://docs.google.com/document/d/1x-RExML5xfAi6NcQeia5HfzJq-Qq8uQzZSqO8ofNogQ/edit?usp=sharing"
+                    style="font-weight: normal;">
+                    <i class="fas fa-info-circle"></i>
+                    About Course Analytics <span style="color: #333;"> (including category definitions)</span>
+                </a>
+            </div>
+        </div>
+        <div>
+            {% if (o.download != '') { %}
+            <a href="{%=o.download%}" target="_blank" title="Download CSV" class="download btn btn-default btn-xs">
+                <i class="fas fa-file-csv"></i>
+                Download CSV File
+            </a>
+            {% } %}
+        </div>
     </div>
 </script>
 <script type="text/x-tmpl" id="tmpl-graphs">
@@ -147,7 +160,10 @@
     <div>
         {% switch(o.state) { 
             case 0: %}<img src="{%=o.svg%}" width="40" alt=""> Loading course information ... {% break; 
-            case 1: %}<a href="#">The course information is empty <small>(click to retry)</small>.</a>{% break; 
+            case 1: %}
+                <a href="#" class="reload">The course information is empty <small>(click to retry)</small>.</a>
+                {% if ((o.err == 'Unauthorized') || (o.c >= 3)) { %}<span class="email">If this problem persists please contact <a href="mailto:help@vula.uct.ac.za?subject=Vula - Please help with: Course Dashboard">help@vula.uct.ac.za</a>.</span>{% } %}
+            {% break; 
             case 2: %}<span class="error">Course information could not be loaded.</span>{% break; 
         } %}
     </div>
