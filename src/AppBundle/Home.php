@@ -28,7 +28,6 @@ class Home {
 
         $has_provider = ($provider && (preg_match_all('/[A-Z]{3}[\d]{4}[A-Z]?,20[\d]{2}/i', $provider_st, $matches) > 0));
         $force_download = $app['tsugi']->context->launch->ltiRawParameter('custom_download','none') == "enable";
-        $force_download = true;
 
         if ($force_download) {
             $context['downloadUrl'] = 'download';
