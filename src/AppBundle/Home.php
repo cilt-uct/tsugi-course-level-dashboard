@@ -9,47 +9,38 @@ use Symfony\Component\HttpFoundation\Response;
 use \Tsugi\Core\Settings;
 use \Tsugi\Util\Net;
 use DateTime;
+use DateTimeZone;
 
 class Home {
 
     public function getPage(Request $request, Application $app) {
         global $CFG, $PDOX;
         $p = $CFG->dbprefix;
-
-        $EID = $app['tsugi']->context->launch->ltiRawParameter('lis_person_sourcedid', $app['tsugi']->user->id);
         
         $context = array();
         $context['styles']  = [ addSession('static/tooltipster.bundle.min.css'), addSession('static/user.css') ];
         $context['scripts'] = [ addSession($CFG->staticroot .'/js/moment.min.js'), addSession('static/tooltipster.bundle.min.js') ];
         $context['loader_svg'] = addSession('static/grid.svg');
-	    $context['getUrl'] = addSession('info');
+        $context['getUrl'] = addSession('info');
         
-        $rows = $PDOX->allRowsDie("SELECT answer, updated FROM {$p}Orientation_Questions
-                    WHERE EID = :EID and user_id = :user_id",
-                    array(':user_id' => $app['tsugi']->user->id, ':EID' => $EID)
-                );
-        if (count($rows) > 0) {
-            $context['selected'] = $rows[0];
-        } else {
-            $context['selected'] = array('answer' => -1, 'updated' => '');
-        }
-                
-        $context['config'] = $app['config'];
+        $provider = $app['tsugi']->context->launch->ltiRawParameter('lis_course_offering_sourcedid','none') != $app['tsugi']->context->launch->ltiRawParameter('context_id','');
+        $provider_st = $app['tsugi']->context->launch->ltiRawParameter('lis_course_offering_sourcedid','none');
 
+        $has_provider = ($provider && (preg_match_all('/[A-Z]{3}[\d]{4}[A-Z]?,20[\d]{2}/i', $provider_st, $matches) > 0));
+        $force_download = $app['tsugi']->context->launch->ltiRawParameter('custom_download','none') == "enable";
+        // $force_download = true; // test
+
+        if ($force_download) {
+            $context['downloadUrl'] = 'download';
+        } else {
+            $context['downloadUrl'] = ($provider && (preg_match_all('/[A-Z]{3}[\d]{4}[A-Z]?,20[\d]{2}/i', $provider_st, $matches) > 0)) ? 'download' : '';
+        }
+
+        $context['config'] = $app['config'];
         $context['result'] = array( 
-            'ext_sakai_server' => $app['tsugi']->context->launch->ltiRawParameter('ext_sakai_server','none')
-            ,'ext_sakai_serverid' => $app['tsugi']->context->launch->ltiRawParameter('ext_sakai_serverid','none') 
-            ,'instructor' => $app['tsugi']->user->instructor
-            ,'siteid' => $app['tsugi']->context->launch->ltiRawParameter('context_id','none')
-            ,'ownerEid' => $app['tsugi']->context->launch->ltiRawParameter('lis_person_sourcedid','none') 
-            ,'ownerEmail' => $app['tsugi']->user->email
-            ,'organizer' => $app['tsugi']->user->displayname
-            ,'language' => 'eng'
-            ,'title' => $app['tsugi']->context->title
-            ,'description' => $app['tsugi']->context->title
-            ,'publisher' => 'University of Cape Town'
-            ,'done' => 0
-            ,'msg'  => 'Application failure.'
+            'siteid' => $app['tsugi']->context->launch->ltiRawParameter('context_id','none')
+            ,'download' => $force_download ? 1 : 0
+            ,'has_provider' => $has_provider ? 1 : 0
         );
 
         return $app['twig']->render('Home.twig', $context);
@@ -72,15 +63,82 @@ class Home {
         return array("title" => $title, "results" => $cloned);
     }
 
+    public function getJSON(Application $app, $site_id, $is_csv = false) {
+
+        $url = 'URL';
+        $data = array('site' => $site_id, 'username' => $app['config']['username'], 'password' => $app['config']['password']);
+        if ($is_csv) {
+            $data['csv'] = '1';
+        }
+        $options = array(
+                'http' => array(
+                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method'  => 'POST',
+                'content' => http_build_query($data),
+            )
+        );
+
+        $context = stream_context_create($options);
+        return json_decode( file_get_contents($app['config']['url'], false, $context), $is_csv);
+    }
+
     public function getInfo(Request $request, Application $app) {
-        $result = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site='. $app['tsugi']->context->launch->ltiRawParameter('context_id','none')));
+        $result = $this->getJSON($app, $app['tsugi']->context->launch->ltiRawParameter('context_id','none'));
 
         // Testing sites: 
-        // $result = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site=2dda0bd3-9100-4034-a404-ff0e34b1887c')); // MAM1000W (2020)
-        // $result = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site=1f718456-7261-43b4-8e40-1dfbf8bdce23')); // PACA Orientation
-        // $result = json_decode( file_get_contents('https://srvslscet001.uct.ac.za/request/?site=4f6abcc6-84f1-4c5c-9df2-08712ea669df')); // CILT LT Team - Dev
+        // $result = $this->getJSON($app, '2dda0bd3-9100-4034-a404-ff0e34b1887c'); // MAM1000W (2020)
+        // $result = $this->getJSON($app, '1f718456-7261-43b4-8e40-1dfbf8bdce23'); // PACA Orientation
+        // $result = $this->getJSON($app, '4f6abcc6-84f1-4c5c-9df2-08712ea669df'); // CILT LT Team - Dev
+        // $result = $this->getJSON($app, '996b25c5-9d5f-4dba-9c7a-507e4862c578'); // loadtest 2012
+        // $result = $this->getJSON($app, 'a30edd67-9678-45cd-92de-7559c7e6a944'); // Sociology Courses
 
         return new Response(json_encode($result), 200, ['Content-Type' => 'application/json']);
+    }
+
+    public function getCSV(Request $request, Application $app) {
+        
+        $data = $this->getJSON($app, $app['tsugi']->context->launch->ltiRawParameter('context_id','none'), true);
+        // $data = $this->getJSON($app, '2dda0bd3-9100-4034-a404-ff0e34b1887c', true); // MAM1000W (2020)
+        // $data = $this->getJSON($app, '996b25c5-9d5f-4dba-9c7a-507e4862c578', true); // loadtest 2012
+
+        if ($data['success'] == 1) {
+            $now = new DateTime();
+            $now->setTimezone(new DateTimeZone('Africa/Johannesburg'));
+
+            // Generate response
+            $response = new Response();
+
+            // Set headers
+            $response->headers->set('Cache-Control', 'private');
+            $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+            $response->headers->set('Content-Disposition', 
+                    'attachment; filename="Analytics '. $data['title'] . ' '. $now->format('Y-m-d_H-i'). '.csv"');
+            //$response->headers->set('Content-length', length($this->outputCSV($data['result'])));
+
+            // Send headers before outputting anything
+            $response->sendHeaders();
+
+            $response->setContent($this->outputCSV($data['result']));
+            return $response;
+        } else {
+            
+            $context = array();
+            $context['styles']  = [ addSession('static/user.css') ];
+
+            return $app['twig']->render('Error.twig', $context);
+        }
+    }
+
+    public function outputCSV($data, $useKeysForHeaderRow = true) {
+        if ($useKeysForHeaderRow) {
+            array_unshift($data, array_keys(reset($data)));
+        }
+    
+        $outputBuffer = fopen("php://output", 'w');
+        foreach($data as $v) {
+            fputcsv($outputBuffer, $v);
+        }
+        fclose($outputBuffer);
     }
 
     public function getFile(Request $request, Application $app, $file = '') {

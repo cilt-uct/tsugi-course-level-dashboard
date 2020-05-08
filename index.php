@@ -15,6 +15,7 @@ if (file_exists('config.cfg')) {
 
 $app->get('/', 'AppBundle\\Home::getPage')->bind('main');
 $app->get('info', 'AppBundle\\Home::getInfo');
+$app->get('download', 'AppBundle\\Home::getCSV');
 $app->get('static/{file}', 'AppBundle\\Home::getFile')->assert('file', '.+');
 
 $app->run();

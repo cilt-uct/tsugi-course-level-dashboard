@@ -58,6 +58,22 @@ section h3 {
   color: #aaa;
 }
 
+.result_container #state span.email {
+  display: block;
+  font-size: 1.25rem;
+  line-height: 6rem;
+}
+
+.result_container #state span.email a {
+  color: #888;
+  text-decoration: underline;
+}
+.result_container #state span.email a:hover,
+.result_container #state span.email a:active {
+  color: #444;
+  text-decoration: underline;
+}
+
 .result_container > .item {
   flex: 0 0 auto;
   margin: 6px;
@@ -179,3 +195,15 @@ section h3 {
 #graph_container > h4 {
   margin: 0;
 } */
+
+div a.download {
+  margin-top: 5px;
+  font-weight: normal;
+  font-size: 0.96rem;
+}
+div a.download > i {
+  font-size: 1.2rem;
+  position: relative;
+  top: 1px;
+  margin-right: 2px;
+}
