@@ -196,28 +196,14 @@ section h3 {
   margin: 0;
 } */
 
-.subheading {
-  display: flex; /* or inline-flex */
-  flex-direction: row
-}
-
-.subheading > div:first-child {
-  flex-grow: 4;
-}
-
-.subheading > div a.download {
+div a.download {
+  margin-top: 5px;
   font-weight: normal;
   font-size: 0.96rem;
 }
-.subheading > div a.download > i {
+div a.download > i {
   font-size: 1.2rem;
   position: relative;
   top: 1px;
   margin-right: 2px;
 }
-
-/*
-.subheading > div:last-child {
-  border: 1px solid blue;
-}
-*/

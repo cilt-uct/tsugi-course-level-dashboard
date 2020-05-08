@@ -6,50 +6,47 @@
         {% } %}
     </h4>
     
-    <div class="subheading">
+
+    {% if (o.hash) { if (o.hash.length > 0) { %}
         <div>
-            {% if (o.hash) { if (o.hash.length > 0) { %}
-            <div>
-                {% if (o.hash.length == 1) { 
-                    var h = Object.entries(o.hash[0])[0]; %}
-                <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=h[1]%}" 
-                    target="_blank" 
-                    style="font-weight: normal;">
-                    <i class="fas fa-external-link-alt"></i>
-                    Student Access Survey results <span style="color: #333;"> (includes orientation activity and poll in CSV download)</span>
-                </a>
-                {% } else { %}
-                    <label>Student Access Survey results:</label>
-                    {% $.each(o.hash, function (k, v) { 
-                        var h = Object.entries(v)[0]; %}
-                        <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=h[1]%}" 
-                            target="_blank" 
-                            style="font-weight: normal; padding-left: 10px;">
-                            <i class="fas fa-external-link-alt"></i>
-                            {%=h[0]%}
-                        </a>
-                    {% }); %}
-                {% } %}
-            </div>
-            {% } } %}
-            <div>
-                <a target="_blank" 
-                    href="https://docs.google.com/document/d/1x-RExML5xfAi6NcQeia5HfzJq-Qq8uQzZSqO8ofNogQ/edit?usp=sharing"
-                    style="font-weight: normal;">
-                    <i class="fas fa-info-circle"></i>
-                    About Course Analytics <span style="color: #333;"> (including category definitions)</span>
-                </a>
-            </div>
+            {% if (o.hash.length == 1) { 
+                var h = Object.entries(o.hash[0])[0]; %}
+            <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=h[1]%}" 
+                target="_blank" 
+                style="font-weight: normal;">
+                <i class="fas fa-external-link-alt"></i>
+                Student Access Survey results <span style="color: #333;"> (includes orientation activity and poll in CSV download)</span>
+            </a>
+            {% } else { %}
+                <label>Student Access Survey results:</label>
+                {% $.each(o.hash, function (k, v) { 
+                    var h = Object.entries(v)[0]; %}
+                    <a href="https://srvslscet001.uct.ac.za/optout/survey/{%=h[1]%}" 
+                        target="_blank" 
+                        style="font-weight: normal; padding-left: 10px;">
+                        <i class="fas fa-external-link-alt"></i>
+                        {%=h[0]%}
+                    </a>
+                {% }); %}
+            {% } %}
         </div>
+    {% } } %}
+    <div>
+        <a target="_blank" 
+            href="https://docs.google.com/document/d/1x-RExML5xfAi6NcQeia5HfzJq-Qq8uQzZSqO8ofNogQ/edit?usp=sharing"
+            style="font-weight: normal;">
+            <i class="fas fa-info-circle"></i>
+            About Course Analytics <span style="color: #333;"> (including category definitions)</span>
+        </a>
+    </div>
+    {% if (o.download != '') { %}
         <div>
-            {% if (o.download != '') { %}
             <a href="{%=o.download%}" target="_blank" title="Download CSV" class="download btn btn-default btn-xs">
                 <i class="fas fa-file-csv"></i>
                 Download CSV File
             </a>
-            {% } %}
         </div>
-    </div>
+    {% } %}
 </script>
 <script type="text/x-tmpl" id="tmpl-graphs">
     {%  
