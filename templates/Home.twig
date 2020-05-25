@@ -88,6 +88,12 @@
                     }
                 }
             },
+            getNewestDate = function (d) {
+                if (d) {
+                    return d.length > 0 ? new Date(Math.max.apply(null, d.map(function(e) { return new Date(e.updated); }))) : ''; 
+                }
+                return '';
+            },
             init = function() {
                 showState(0, true);
                 $.get('{{getUrl}}', function(_data) {
@@ -96,18 +102,21 @@
                     $('#title').html(tmpl('tmpl-link', _data));
 
                     if (_data.success == "1") {
-                        var orientation_updated = _data.orientation.length > 0 ? new Date(Math.max.apply(null, _data.orientation.map(function(e) { return new Date(e.updated); }))) : '', 
-                            o_activity_updated = _data.orientation_activity.length > 0 ? new Date(Math.max.apply(null, _data.orientation_activity.map(function(e) { return new Date(e.updated); }))) : '', 
-                            survey_updated = _data.survey.length > 0 ? new Date(Math.max.apply(null, _data.survey.map(function(e) { return new Date(e.updated); }))) : '',
+                        var orientation_updated = getNewestDate(_data.orientation), 
+                            o_activity_updated = getNewestDate(_data.orientation_activity),
+                            survey_updated = getNewestDate(_data.survey),
                             show_login = false;
 
                         var updated = new Date(Math.max(orientation_updated, o_activity_updated, survey_updated));
 
                         $.each( Object.keys(_data).filter((i) => i.indexOf('week') >= 0), function(i, w) {
-                            var d = _data[w];
-                            show_login = ((new Date() >= new Date(d.start)) && (new Date() <= new Date(d.active))) && (d.list.length > 0);
-                            if (show_login) {
-                                return;
+                            var d = _data[w],
+                                l = typeof(d.list) !== 'undefined' ? (d.list.length > 0) : false;
+                            if (!show_login) {
+                                show_login = ((new Date() >= new Date(d.start)) && (new Date() <= new Date(d.active))) && l;    
+                            }
+                            if (l) {
+                                updated = new Date(Math.max(updated, getNewestDate(d.list)));
                             }
                         });    
 

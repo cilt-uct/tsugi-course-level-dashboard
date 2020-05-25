@@ -22,7 +22,7 @@ class Home {
         $context['scripts'] = [ addSession($CFG->staticroot .'/js/moment.min.js'), addSession('static/tooltipster.bundle.min.js') ];
         $context['loader_svg'] = addSession('static/grid.svg');
         $context['getUrl'] = addSession('info');
-        
+
         $provider = $app['tsugi']->context->launch->ltiRawParameter('lis_course_offering_sourcedid','none') != $app['tsugi']->context->launch->ltiRawParameter('context_id','');
         $provider_st = $app['tsugi']->context->launch->ltiRawParameter('lis_course_offering_sourcedid','none');
 
@@ -65,8 +65,12 @@ class Home {
 
     public function getJSON(Application $app, $site_id, $is_csv = false) {
 
-        $url = 'URL';
-        $data = array('site' => $site_id, 'username' => $app['config']['username'], 'password' => $app['config']['password']);
+
+        $real_weeks = ($app['tsugi']->context->launch->ltiRawParameter('custom_real_week_no','false') == "true") | ($app['config']['real_weeks'] == '1');
+        $data = array('site' => $site_id, 
+                        'real_weeks' => $real_weeks ? 1 : 0,
+                        'username' => $app['config']['username'], 
+                        'password' => $app['config']['password']);
         if ($is_csv) {
             $data['csv'] = '1';
         }
@@ -85,12 +89,13 @@ class Home {
     public function getInfo(Request $request, Application $app) {
         $result = $this->getJSON($app, $app['tsugi']->context->launch->ltiRawParameter('context_id','none'));
 
-        // Testing sites: 
+        // Testing: 
         // $result = $this->getJSON($app, '2dda0bd3-9100-4034-a404-ff0e34b1887c'); // MAM1000W (2020)
         // $result = $this->getJSON($app, '1f718456-7261-43b4-8e40-1dfbf8bdce23'); // PACA Orientation
         // $result = $this->getJSON($app, '4f6abcc6-84f1-4c5c-9df2-08712ea669df'); // CILT LT Team - Dev
         // $result = $this->getJSON($app, '996b25c5-9d5f-4dba-9c7a-507e4862c578'); // loadtest 2012
         // $result = $this->getJSON($app, 'a30edd67-9678-45cd-92de-7559c7e6a944'); // Sociology Courses
+        // $result = $this->getJSON($app, 'ac4e7899-7600-4516-a6c2-702513cb0230'); // ISFAP Students
 
         return new Response(json_encode($result), 200, ['Content-Type' => 'application/json']);
     }
@@ -98,8 +103,11 @@ class Home {
     public function getCSV(Request $request, Application $app) {
         
         $data = $this->getJSON($app, $app['tsugi']->context->launch->ltiRawParameter('context_id','none'), true);
+
+        // Testing: 
         // $data = $this->getJSON($app, '2dda0bd3-9100-4034-a404-ff0e34b1887c', true); // MAM1000W (2020)
         // $data = $this->getJSON($app, '996b25c5-9d5f-4dba-9c7a-507e4862c578', true); // loadtest 2012
+        // $data = $this->getJSON($app, 'ac4e7899-7600-4516-a6c2-702513cb0230', true); // ISFAP Students
 
         if ($data['success'] == 1) {
             $now = new DateTime();

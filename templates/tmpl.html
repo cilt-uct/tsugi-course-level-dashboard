@@ -65,50 +65,45 @@
                 title: 'Orientation Poll'
                 ,no_students: o.no_students
                 ,list: [{"t": "No response", "c": "gray", "v": o.no_students}]
-            },
-            Week1 = {
-                title: 'Week 1 Activity'
-                ,no_students: o.no_students
-                ,list: [{"t": "No data yet", "c": "empty", "v": o.no_students}]
-            },
-            Week2 = {
-                title: 'Week 2 Activity'
-                ,no_students: o.no_students
-                ,list: [{"t": "No data yet", "c": "empty", "v": o.no_students}]
+            };
+        
+        if (o.survey) {
+            if (o.survey.length > 0) {
+                survey_arr['list']= [
+                    {"t": "Good", "c": "green", "v": data.survey.filter((i) => i.val == "GREEN").length},
+                    {"t": "Uncertain", "c": "orange", "v": data.survey.filter((i) => i.val == "ORANGE").length}, 
+                    {"t": "Unlikely", "c": "red", "v": data.survey.filter((i) => i.val == "RED").length},
+                    {"t": "Unknown", "c": "gray", "v": o.no_students - o.survey.length}
+                ];
             }
-            
-        if (o.survey.length > 0) {
-            survey_arr['list']= [
-                {"t": "Good", "c": "green", "v": data.survey.filter((i) => i.val == "GREEN").length},
-                {"t": "Uncertain", "c": "orange", "v": data.survey.filter((i) => i.val == "ORANGE").length}, 
-                {"t": "Unlikely", "c": "red", "v": data.survey.filter((i) => i.val == "RED").length},
-                {"t": "Unknown", "c": "gray", "v": o.no_students - o.survey.length}
-            ];
+            cols.push(survey_arr);
+        }
+
+        if (o.orientation) {
+            if (o.orientation_activity.length > 0) {
+                activity_arr['list']= [
+                    //{"t": "Logged in to Vula", "c": "blue", "v": o.orientation_activity.sum('val')}
+                    {"t": "Viewed orientation lessons on a laptop, desktop or tablet", "c": "green", "v": data.orientation_activity.filter((i) => i.val == "GREEN").length},
+                    {"t": "Logged in to Vula but limited or no activity on orientation site, and/or accessed Vula only from a smartphone", "c": "orange", "v": data.orientation_activity.filter((i) => i.val == "ORANGE").length}, 
+                    {"t": "Has not logged in", "c": (new Date() < new Date(o.orientation_activity_end_date) ? "gray" : "red"), "v": o.no_students - o.orientation_activity.length}
+                ];
+                // orientation switches to red after a certain date (orientation_activity_end_date)
+            }
+            cols.push(activity_arr);
         }
         
-        if (o.orientation.length > 0) {
-            orientation_arr['list']= [
-                {"t": "Good", "c": "green", "v": o.orientation.filter((i) => i.val == "1").length},
-                {"t": "Unsure", "c": "orange", "v": o.orientation.filter((i) => i.val == "0").length}, 
-                {"t": "No response", "c": "gray", "v": o.no_students - o.orientation.length}
-            ];
+        if (o.orientation) {
+            if (o.orientation.length > 0) {
+                orientation_arr['list']= [
+                    {"t": "Good", "c": "green", "v": o.orientation.filter((i) => i.val == "1").length},
+                    {"t": "Unsure", "c": "orange", "v": o.orientation.filter((i) => i.val == "0").length}, 
+                    {"t": "No response", "c": "gray", "v": o.no_students - o.orientation.length}
+                ];
+            }
+            cols.push(orientation_arr);
         }
 
-        if (o.orientation_activity.length > 0) {
-            activity_arr['list']= [
-                //{"t": "Logged in to Vula", "c": "blue", "v": o.orientation_activity.sum('val')}
-                {"t": "Viewed orientation lessons on a laptop, desktop or tablet", "c": "green", "v": data.orientation_activity.filter((i) => i.val == "GREEN").length},
-                {"t": "Logged in to Vula but limited or no activity on orientation site, and/or accessed Vula only from a smartphone", "c": "orange", "v": data.orientation_activity.filter((i) => i.val == "ORANGE").length}, 
-                {"t": "Has not logged in", "c": (new Date() < new Date(o.orientation_activity_end_date) ? "gray" : "red"), "v": o.no_students - o.orientation_activity.length}
-            ];
-            // orientation switches to red after a certain date (orientation_activity_end_date)
-        }
-
-        cols.push(survey_arr);
-        cols.push(activity_arr);
-        cols.push(orientation_arr);
-
-        $.each( Object.keys(o).filter((i) => i.indexOf('week') >= 0), function(i, w) {
+        $.each( Object.keys(o).filter((i) => i.indexOf('week') == 0), function(i, w) {
             cols.push(getWeekData(w.split('_')[1], o.no_students, o[w] )); 
         });
 
