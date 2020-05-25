@@ -65,8 +65,8 @@ class Home {
 
     public function getJSON(Application $app, $site_id, $is_csv = false) {
 
-
-        $real_weeks = ($app['tsugi']->context->launch->ltiRawParameter('custom_real_week_no','false') == "true") | ($app['config']['real_weeks'] == '1');
+        $real_weeks = isset($app['config']['real_weeks']) ? ($app['config']['real_weeks'] == '1') : false;
+        $real_weeks = ($app['tsugi']->context->launch->ltiRawParameter('custom_real_week_no','false') == "true") | $real_weeks;
         $data = array('site' => $site_id, 
                         'real_weeks' => $real_weeks ? 1 : 0,
                         'username' => $app['config']['username'], 
