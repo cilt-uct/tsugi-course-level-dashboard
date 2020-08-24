@@ -47,6 +47,9 @@
     function getWeekData (no, no_students, w) {
         var result = {
                 title: 'Week '+ no +' Activity'
+                ,st: w.start
+                ,ed: w.end
+                ,showdate: true
                 ,no_students: no_students
                 ,list: [{"t": "No data yet", "c": "empty", "v": no_students}]
             };
@@ -120,7 +123,11 @@
                             }
                         });    
 
-                        $("#last").html(tmpl('tmpl-last-saved', {'students': _data.no_students, 'updated' : updated, 'show_login': show_login }));
+                        $("#last").html(tmpl('tmpl-last-saved', {'students': _data.no_students, 
+                                                                'updated' : updated, 
+                                                                'show_login': show_login, 
+                                                                'start_date': _data.start_date,
+                                                                'end_date': _data.end_date }));
 
                         $("#graphs").html(tmpl('tmpl-graphs', _data));
                         $('.tt').tooltipster({ theme: 'tooltipster-borderless', maxWidth: 300, distance: 0, animationDuration: 200, animation: 'grow'});

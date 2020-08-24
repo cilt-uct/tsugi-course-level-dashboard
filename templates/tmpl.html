@@ -53,16 +53,21 @@
         var cols = [],
             survey_arr = {
                 title: 'Access Survey'
+                ,showdate: false
                 ,no_students: o.no_students
                 ,list: [{"t": "No data yet", "c": "empty", "v": o.no_students}]
             },
             activity_arr = {
                 title: 'Orientation Activity'
+                ,st: '2020-04-26'
+                ,ed: '2020-05-02'
+                ,showdate: true
                 ,no_students: o.no_students
                 ,list: [{"t": "No data yet", "c": "empty", "v": o.no_students}]
             },
             orientation_arr = {
                 title: 'Orientation Poll'
+                ,showdate: false
                 ,no_students: o.no_students
                 ,list: [{"t": "No response", "c": "gray", "v": o.no_students}]
             };
@@ -107,15 +112,15 @@
             cols.push(getWeekData(w.split('_')[1], o.no_students, o[w] )); 
         });
 
-        /* console.log(cols); */
+        console.log(cols);
         $.each(cols, function(i, el) { 
             el.i = i;
-            include('tmpl-graph-column', el); 
+            include('tmpl-graph-column', el);
         }); %}
 </script>
 <script type="text/x-tmpl" id="tmpl-graph-column">
     {% /* console.log(o); */ %}
-    <div id="item-{%=o.i%}" class="item" data-title="{%=o.title%}">
+    <div id="item-{%=o.i%}" class="item {%=(o.showdate?'date':'')%}" data-title="{%=o.title%}" data-date="{%=moment(o.st).format("MMM D")%} - {%=moment(o.ed).format("MMM D")%}">
         {%  $.each(o.list, function(e, el) { 
             el.x = o.no_students;
             include('tmpl-graph-line', el); 
@@ -144,7 +149,11 @@
         <div>
             <i class="fas fa-users"></i>&nbsp;
             Students: <span>{%=o.students%}</span>
-        </div>     
+        </div>
+        <div>
+            <i class="fa fa-calendar-o"></i>&nbsp;
+            Dates: <span style="color: #888;">{%=moment(o.start_date).format("MMM D")%} - {%=moment(o.end_date).format("MMM D, YYYY")%}</span>
+        </div>
     </div>
 </script>
 <script type="text/x-tmpl" id="tmpl-state">

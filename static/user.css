@@ -98,6 +98,9 @@ section h3 {
   z-index: 0;
   line-height: 20px;
 }
+.result_container > .item.date:hover::before {
+    content: attr(data-date);
+}
 
 .result_container > .item > div{
   display: flex;
