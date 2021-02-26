@@ -38,7 +38,32 @@ class CourseDAO {
         );
 
         $context = stream_context_create($options);
-
+        // return file_get_contents($this->url, false, $context);
         return json_decode( file_get_contents($this->url, false, $context), $is_csv);
+    }
+
+    public function getWeek($site_id, $week, $real, $start_date, $end_date) {
+
+        $data = array('site' => $site_id, 
+                        'real_weeks' => $this->real_weeks ? 1 : 0,
+                        'active_year' => 2020, # this tool is locked in 2020
+                        'username' => $this->username, 
+                        'password' => $this->password,
+                        'week' => $week,
+                        'real' => $real,
+                        'start_date' => $start_date,
+                        'end_date' => $end_date,
+                    );
+        $options = array(
+                'http' => array(
+                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                'method'  => 'POST',
+                'content' => http_build_query($data),
+            )
+        );
+
+        $context = stream_context_create($options);
+        
+        return json_decode( file_get_contents($this->url, false, $context), false);
     }
 }

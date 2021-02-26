@@ -3,108 +3,216 @@
 {% endforeach; %}
 
 <script type="text/javascript">
-var data = [];
+jQuery.fn.exists = function(){ return this.length > 0; }
 
-function getWeekData (no, no_students, w) {
+var data = [],
+    tmp = [];
+
+function getWeekData (term, no_students, w, real_weeks = false, init = false) {
     var result = {
-            title: 'Week '+ no +' Activity'
+            title: 'Week '+ w.id +' Activity'
+            ,id: w.id
+            ,real: w.real
             ,st: w.start
             ,ed: w.end
             ,showdate: true
+            ,realweek: real_weeks
+            ,full: init
+            ,loaded: w.loaded
             ,no_students: no_students
             ,list: [{"t": "No data yet", "c": "empty", "v": no_students}]
         };
 
-    if ('list' in w) {
-        if (w.list.length > 0) {
-            if (new Date() >= new Date(w.start)) {
-                var r = w.list.length;
-                result['list'] = [];
-                if (new Date() < new Date(w.active)) {
-                    result['list'].push({"t": "Logged in to Vula", "c": "blue", "v": r});
-                } else {
-                    result['list'].push({"t": "Active engagement in 2 or more course sites over 2 or more days", "c": "green", "v": w.list.filter((i) => i.val == "GREEN").length});
-                    result['list'].push({"t": "Logged in to Vula but limited or no activity, and/or accessed Vula only from a smartphone", "c": "orange", "v": w.list.filter((i) => i.val == "ORANGE").length});
+    switch (w.id) {
+        case "survey": 
+            result.title = 'Access Survey';
+            result.showdate = false;
+
+            if ('list' in w) {
+                if (w.list.length > 0) {
+                    result['list'] = [
+                        {"t": "Good", "c": "green", "v": w.list.filter((i) => i.val == "GREEN").length},
+                        {"t": "Uncertain", "c": "orange", "v": w.list.filter((i) => i.val == "ORANGE").length}, 
+                        {"t": "Unlikely", "c": "red", "v": w.list.filter((i) => i.val == "RED").length},
+                        {"t": "Unknown", "c": "gray", "v": no_students - w.list.length}
+                    ];
                 }
-                result['list'].push({"t": "Has not logged in", "c": (new Date() < new Date(w.end) ? "gray" : "red"), "v": no_students - r});
             }
-        }
-    } 
-    return result;  
+            break;
+        case "orientation":
+            result.title = 'Orientation Poll';
+            result.showdate = false;
+            result.list = [{"t": "No response", "c": "gray", "v": no_students}];
+
+            if ('list' in w) {
+                if (w.list.length > 0) {
+                    result['list'] = [
+                        {"t": "Good", "c": "green", "v": w.list.filter((i) => i.val == "1").length},
+                        {"t": "Unsure", "c": "orange", "v": w.list.filter((i) => i.val == "0").length}, 
+                        {"t": "No response", "c": "gray", "v": no_students - w.list.length}
+                    ];
+                }
+            }
+            break;
+        case "orientation_activity":
+            result.title = 'Orientation Activity';
+            result.showdate = true;
+
+            if ('list' in w) {
+                if (w.list.length > 0) {
+                    result['list'] = [
+                        {"t": "Viewed orientation lessons on a laptop, desktop or tablet", "c": "green", "v": w.list.filter((i) => i.val == "GREEN").length},
+                        {"t": "Logged in to Vula but limited or no activity on orientation site, and/or accessed Vula only from a smartphone", "c": "orange", "v": w.list.filter((i) => i.val == "ORANGE").length}, 
+                        {"t": "Has not logged in", "c": (new Date() < new Date(w.active) ? "gray" : "red"), "v": no_students - w.list.length}
+                    ];
+                }
+            }
+            break;
+        default:
+            if ('list' in w) {
+                if (w.list.length > 0) {
+                    if (new Date() >= new Date(w.start)) {
+                        var r = w.list.length;
+                        result['list'] = [];
+                        if (new Date() < new Date(w.active)) {
+                            result['list'].push({"t": "Logged in to Vula", "c": "blue", "v": r});
+                        } else {
+                            result['list'].push({"t": "Active engagement in 2 or more course sites over 2 or more days", "c": "green", "v": w.list.filter((i) => i.val == "GREEN").length});
+                            result['list'].push({"t": "Logged in to Vula but limited or no activity, and/or accessed Vula only from a smartphone", "c": "orange", "v": w.list.filter((i) => i.val == "ORANGE").length});
+                        }
+                        result['list'].push({"t": "Has not logged in", "c": (new Date() < new Date(w.end) ? "gray" : "red"), "v": no_students - r});
+                    }
+                }
+            }
+            break;
+    }
+    
+    return init ? result : cleanObj(result);
+}
+
+function getNewestDate(d) {
+    if (d) {
+        return d.length > 0 ? new Date(Math.max.apply(null, d.map(function(e) { return new Date(e.updated); }))) : ''; 
+    }
+    return '';
+}
+
+function updateLatestDate() {
+    let orientation_updated = ('orientation_date' in data) ? new Date(data['orientation_date']) : null,
+        loaded = new Date(Math.max(...$.map( $("#graphs > div"), function( div, key ) { return $(div).data('latest'); })));
+    
+    if ($('#last_updated').exists()) {
+        $('#last_updated').html(moment(Math.max(loaded, orientation_updated)).calendar());
+    }
+}
+
+function fetchWeekData(week_name) {
+    let _week_name = week_name,
+        _el = $("#item-" + _week_name);
+
+        // set loading
+        _el.find('div.item_empty, div.item_gray').html(tmpl('tmpl-internal-loader', {}));
+    
+        $.ajax({url: "{{$fetchWeekDataUrl}}",
+                method: "POST",
+                data: _el.data(),
+                dataType: "json",
+                cache: false 
+        })
+        .done(function(result) {
+
+            tmp = result;
+            if (result.success === 1) {
+                result['list'] = result['result'];
+
+                let el = $("#item-" + result['week']),
+                    _w = getWeekData(data.term, data.no_students, result, result['real_weeks'], false);
+
+                el.data('latest', getNewestDate(result['list']));
+                el.data('loaded', true);
+                el.html(tmpl('tmpl-graph-column', _w));
+                el.find('.tt').tooltipster({ theme: 'tooltipster-borderless', maxWidth: 300, distance: 0, animationDuration: 200, animation: 'grow'});
+                updateLatestDate();
+            }
+        })
+        .fail(function() {
+            _el.find('div.item_empty, div.item_gray').html(tmpl('tmpl-internal-error', {id: _week_name}));
+        })
 }
 
 $(function() {
-
+    
     var error_count = 0,
-        showState = function(_state, instant, err) {
+        showState = function(_state, instant, err = false) {
             _state = _state || 0;
             instant = instant || false;
-            console.log(err);
+            if (err) {
+                console.log(err);
+            }
             if (instant) {
                 $("#graphs").html(tmpl('tmpl-state', {state: _state, err: err, c: error_count, svg: 'static/grid.svg'}));
             } else {
                 if ($('#state:visible').length) {
                     $('#state').fadeOut(350, function() {
-                    showState(_state, instant, err);
+                        showState(_state, instant, err);
                     });
                 } else {
                     $("#graphs").hide().html(tmpl('tmpl-state', {state: _state,  err: err, c: error_count, svg: 'static/grid.svg'})).fadeIn(300);
                 }
             }
         },
-        getNewestDate = function (d) {
-            if (d) {
-                return d.length > 0 ? new Date(Math.max.apply(null, d.map(function(e) { return new Date(e.updated); }))) : ''; 
-            }
-            return '';
-        },
         init = function() {
             showState(0, true);
-            $.get('{{$getUrl}}', function(_data) {
+            
+            $.get('{{$getInfoURL}}', function(_data) {
                 data = _data;
                 _data['download'] = $('#title').data('url');
                 $('#title').html(tmpl('tmpl-link', _data));
 
                 if (_data.success == "1") {
-                    var orientation_updated = getNewestDate(_data.orientation), 
-                        o_activity_updated = getNewestDate(_data.orientation_activity),
-                        survey_updated = getNewestDate(_data.survey),
-                        show_login = false;
-
-                    var updated = new Date(Math.max(orientation_updated, o_activity_updated, survey_updated));
-
-                    $.each( Object.keys(_data).filter((i) => i.indexOf('week') >= 0), function(i, w) {
-                        var d = _data[w],
-                            l = typeof(d.list) !== 'undefined' ? (d.list.length > 0) : false;
-                        if (!show_login) {
-                            show_login = ((new Date() >= new Date(d.start)) && (new Date() <= new Date(d.active))) && l;    
-                        }
-                        if (l) {
-                            updated = new Date(Math.max(updated, getNewestDate(d.list)));
-                        }
-                    });    
+                    
+                    let show_login = false;
+                    $.each(data.result, function(i,d) { 
+                        if (!show_login) { 
+                            show_login = ((new Date() >= new Date(d.start)) && (new Date() <= new Date(d.active))) && l; 
+                        } 
+                    });
 
                     $("#last").html(tmpl('tmpl-last-saved', {'students': _data.no_students, 
-                                                            'updated' : updated, 
+                                                            'updated' : "",
                                                             'show_login': show_login, 
                                                             'start_date': _data.start_date,
                                                             'end_date': _data.end_date }));
 
                     $("#graphs").html(tmpl('tmpl-graphs', _data));
                     $('.tt').tooltipster({ theme: 'tooltipster-borderless', maxWidth: 300, distance: 0, animationDuration: 200, animation: 'grow'});
+
+                    
+                    $("#graphs > div").filter(function() { 
+                        return $(this).data("loaded") == false
+                    }).each(function () {
+                        fetchWeekData($(this).data('week'));
+                    });
                 } else {
                     $("#last").html(tmpl('tmpl-last-saved', {'students': 'NA', 'updated' : '' }))
                     showState(1, false, _data['err']);
                 }
+
             }).fail(function() {
                 showState(2);
             });
+            
         };
 
     $("#graphs").on("click","#state a.reload", function(event) {
         event.preventDefault();
         error_count ++;
         init();
+    });
+
+    $("#graphs").on("click",".item_gray > a, .item_empty > a", function(event) {
+        event.preventDefault();
+        fetchWeekData($(this).attr('ref'));
     });
 
     init();

@@ -153,6 +153,19 @@ section h3 {
   border: 1px dashed #E6E6E6;
 }
 
+.result_container .item_gray > svg,
+.result_container .item_empty > svg {
+    width: 100px;
+    height: 100px;
+    margin: 20px;
+    display: inline-block;
+}
+.result_container .item_gray > a,
+.result_container .item_empty > a {
+    display: block;
+    padding: 50px;
+}
+
 #last {
   display: flex;
   justify-content: space-between;

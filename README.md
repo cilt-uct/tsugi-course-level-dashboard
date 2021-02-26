@@ -1,12 +1,11 @@
 # tsugi-course-level-dashoard
 
 ## Configuration
-1. Copy `cp config-dist.cfg config.cfg`
-2. Update the details of `config.cfg` to connect to the REST API
+1. Copy `cp tool-config-dist.php tool-config.php`
+2. Update the details of `tool-config.php` to connect to the REST API
 
-```
-real_weeks = false    [Default: false - Use actual week numbers, not counting from 1 upwards]
-```
+Set `real_weeks` to `true` to count from 1 upwards.
+[ Default: false - Use actual week numbers, not counting from 1 upwards ]
 
 #### Enable Downloads for project / course site without provider information
 

@@ -23,7 +23,8 @@ $config = [
     'instructor' => $USER->instructor, 
     'styles'     => [ 'static/tooltipster.bundle.min.css', 'static/user.css' ],
     'scripts'    => [ $CFG->staticroot .'/js/moment.min.js', 'static/tooltipster.bundle.min.js' ],
-    'getUrl'     => addSession('actions/GetInfo.php'),
+    'getInfoURL'     => addSession('actions/GetInfo.php'),
+    'fetchWeekDataUrl'     => addSession('actions/GetWeek.php'),
     'tool' => $tool
 ];
 
@@ -35,9 +36,9 @@ $force_download = $LAUNCH->ltiRawParameter('custom_download','none') == "enable"
 $force_download = true; // test
 
 if ($force_download) {
-    $config['downloadUrl'] = addSession('actions/GetCSV.php');
+    $config['downloadUrl'] = 'actions/GetCSV.php';
 } else {
-    $context['downloadUrl'] = ($provider && (preg_match_all('/[A-Z]{3}[\d]{4}[A-Z]?,20[\d]{2}/i', $provider_st, $matches) > 0)) ? addSession('actions/GetCSV.php') : '';
+    $context['downloadUrl'] = ($provider && (preg_match_all('/[A-Z]{3}[\d]{4}[A-Z]?,20[\d]{2}/i', $provider_st, $matches) > 0)) ? 'actions/GetCSV.php' : '';
 }
 
 $config['result'] = array( 

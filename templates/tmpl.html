@@ -4,8 +4,8 @@
         {% if ((o.no_students != '') & (o.no_students != undefined)) { %}
             <span>({%=formatNumber(o.no_students)%} students)</span>
         {% } %}
+        <span>[{%=o.term%}]</span>
     </h4>
-    
 
     {% if (o.hash) { if (o.hash.length > 0) { %}
         <div>
@@ -50,101 +50,44 @@
 </script>
 <script type="text/x-tmpl" id="tmpl-graphs">
     {%  
-        var cols = [],
-            survey_arr = {
-                title: 'Access Survey'
-                ,showdate: false
-                ,no_students: o.no_students
-                ,list: [{"t": "No data yet", "c": "empty", "v": o.no_students}]
-            },
-            activity_arr = {
-                title: 'Orientation Activity'
-                ,st: '2020-04-26'
-                ,ed: '2020-05-02'
-                ,showdate: true
-                ,no_students: o.no_students
-                ,list: [{"t": "No data yet", "c": "empty", "v": o.no_students}]
-            },
-            orientation_arr = {
-                title: 'Orientation Poll'
-                ,showdate: false
-                ,no_students: o.no_students
-                ,list: [{"t": "No response", "c": "gray", "v": o.no_students}]
-            };
-        
-        if (o.survey) {
-            if (o.survey.length > 0) {
-                survey_arr['list']= [
-                    {"t": "Good", "c": "green", "v": data.survey.filter((i) => i.val == "GREEN").length},
-                    {"t": "Uncertain", "c": "orange", "v": data.survey.filter((i) => i.val == "ORANGE").length}, 
-                    {"t": "Unlikely", "c": "red", "v": data.survey.filter((i) => i.val == "RED").length},
-                    {"t": "Unknown", "c": "gray", "v": o.no_students - o.survey.length}
-                ];
-            }
-            cols.push(survey_arr);
-        }
-
-        if (o.orientation) {
-            if (o.orientation_activity.length > 0) {
-                activity_arr['list']= [
-                    //{"t": "Logged in to Vula", "c": "blue", "v": o.orientation_activity.sum('val')}
-                    {"t": "Viewed orientation lessons on a laptop, desktop or tablet", "c": "green", "v": data.orientation_activity.filter((i) => i.val == "GREEN").length},
-                    {"t": "Logged in to Vula but limited or no activity on orientation site, and/or accessed Vula only from a smartphone", "c": "orange", "v": data.orientation_activity.filter((i) => i.val == "ORANGE").length}, 
-                    {"t": "Has not logged in", "c": (new Date() < new Date(o.orientation_activity_end_date) ? "gray" : "red"), "v": o.no_students - o.orientation_activity.length}
-                ];
-                // orientation switches to red after a certain date (orientation_activity_end_date)
-            }
-            cols.push(activity_arr);
-        }
-        
-        if (o.orientation) {
-            if (o.orientation.length > 0) {
-                orientation_arr['list']= [
-                    {"t": "Good", "c": "green", "v": o.orientation.filter((i) => i.val == "1").length},
-                    {"t": "Unsure", "c": "orange", "v": o.orientation.filter((i) => i.val == "0").length}, 
-                    {"t": "No response", "c": "gray", "v": o.no_students - o.orientation.length}
-                ];
-            }
-            cols.push(orientation_arr);
-        }
-
-        $.each( Object.keys(o).filter((i) => i.indexOf('week') == 0), function(i, w) {
-            cols.push(getWeekData(w.split('_')[1], o.no_students, o[w] )); 
+        $.each( o.result, function(i, w) {
+            include('tmpl-graph-column', getWeekData(o.term, o.no_students, w, o.real_weeks, true));
         });
-
-        console.log(cols);
-        $.each(cols, function(i, el) { 
-            el.i = i;
-            include('tmpl-graph-column', el);
-        }); %}
+    %}
 </script>
 <script type="text/x-tmpl" id="tmpl-graph-column">
-    {% /* console.log(o); */ %}
-    <div id="item-{%=o.i%}" class="item {%=(o.showdate?'date':'')%}" data-title="{%=o.title%}" data-date="{%=moment(o.st).format("MMM D")%} - {%=moment(o.ed).format("MMM D")%}">
+    {% if (o.full) { %}
+    <div id="item-{%=o.id%}" data-week="{%=o.id%}" data-real="{%=o.real%}" data-loaded="{%=o.loaded%}" data-realweek="{%=o.realweek%}" 
+        data-start="{%=o.st%}" data-end="{%=o.ed%}" data-total="{%=o.no_students%}" data-showdate="{%=o.showdate ? "1" : "0" %}"
+        class="item {%=(o.showdate?'date':'')%}" data-title="{%=o.title%}" data-date="{%=moment(o.st).format("MMM D")%} - {%=moment(o.ed).format("MMM D")%}">
+    {% } %}    
         {%  $.each(o.list, function(e, el) { 
             el.x = o.no_students;
             include('tmpl-graph-line', el); 
         }); %}
+    {% if (o.full) { %}
     </div>
+    {% } %}
 </script>
 <script type="text/x-tmpl" id="tmpl-graph-line">
-    {% /* console.log(o); */ %}
     {% var p = o.x == 0 ? 1 : (o.v / o.x) * 100; %}
     <div class="item_{%=o.c%} tt" style="flex: {%=p%};" 
-        title="{% if(o.c != 'empty') { %}{%=(o.t != ''? o.t+": " : "")%}{%=Math.round(p, 2)%} % ({%=o.v%})"{% } else { %}{%=o.t%}{% } %}""></div>
+        title="{% if(o.c != 'empty') { %}{%=(o.t != ''? o.t+": " : "")%}{%=Math.round(p, 2)%} % ({%=o.v%})"{% } else { %}{%=o.t%}{% } %}">
+    </div>
 </script>
 <script type="text/x-tmpl" id="tmpl-last-saved">
     <div>
-        <div class="green">Likely to be able to participate effectively in remote learning</div>
-        <div class="orange">Substantial uncertainty about ability to participate effectively in remote learning</div>
-        <div class="red">Unlikely to be able to participate effectively in remote learning</div>
-        {% if (o.show_login) { %}<div class="blue">Logged in to Vula in the time period</div>{% } %}
-        <div class="gray">Did not participate in the survey or poll, not logged in yet or no data for this student</div>
+        <div id="legend_green" class="green">Likely to be able to participate effectively in remote learning</div>
+        <div id="legend_orange" class="orange">Substantial uncertainty about ability to participate effectively in remote learning</div>
+        <div id="legend_red" class="red">Unlikely to be able to participate effectively in remote learning</div>
+        <div id="legend_blue" class="blue" style="{%=(o.show_login ? "" : "display:none")%}">Logged in to Vula in the time period</div>
+        <div id="legend_gray" class="gray">Did not participate in the survey or poll, not logged in yet or no data for this student</div>
     </div>
     <div>
         <div>
             <i class="far fa-clock"></i>&nbsp;
-            {% if (o.updated != '') { %}Last updated: <span>{%=moment(o.updated).calendar()%}</span>{% } else { %}Last updated: <span>Never</span> {% } %}
+            Last updated: <span id="last_updated" data-date="{%=o.updated%}">
+                    {% if (o.updated != '') { %}{%=moment(o.updated).calendar()%}</span>{% } else { %}Never{% } %}</span>
         </div>        
         <div>
             <i class="fas fa-users"></i>&nbsp;
@@ -160,7 +103,7 @@
 <div id="state" class="fa-3x">
     <div>
         {% switch(o.state) { 
-            case 0: %}<img src="{%=o.svg%}" width="40" alt=""> Loading course information ... {% break; 
+            case 0: %}<img src="{%=o.svg%}" width="50" alt=""> Loading course information ... {% break; 
             case 1: %}
                 <a href="#" class="reload">The course information is empty <small>(click to retry)</small>.</a>
                 {% if ((o.err == 'Unauthorized') || (o.c >= 3)) { %}<span class="email">If this problem persists please contact <a href="mailto:help@vula.uct.ac.za?subject=Vula - Please help with: Course Dashboard">help@vula.uct.ac.za</a>.</span>{% } %}
@@ -169,4 +112,38 @@
         } %}
     </div>
 </div>
+</script>
+<script type="text/x-tmpl" id="tmpl-internal-loader">
+<svg version="1.1" id="L4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+  viewBox="0 0 60 100" enable-background="new 0 0 0 0" xml:space="preserve">
+  <circle fill="#777" stroke="none" cx="6" cy="50" r="6">
+    <animate
+      attributeName="opacity"
+      dur="1s"
+      values="0;1;0"
+      repeatCount="indefinite"
+      begin="0.1"/>    
+  </circle>
+  <circle fill="#777" stroke="none" cx="26" cy="50" r="6">
+    <animate
+      attributeName="opacity"
+      dur="1s"
+      values="0;1;0"
+      repeatCount="indefinite" 
+      begin="0.2"/>       
+  </circle>
+  <circle fill="#777" stroke="none" cx="46" cy="50" r="6">
+    <animate
+      attributeName="opacity"
+      dur="1s"
+      values="0;1;0"
+      repeatCount="indefinite" 
+      begin="0.3"/>     
+  </circle>
+</svg>
+</script>
+<script type="text/x-tmpl" id="tmpl-internal-error">
+    <a href="#" ref="{%=o.id%}" title="Click to reload week data">
+        <img src="static/error.svg" width="50" alt="Error loading week">
+    </a>
 </script>
