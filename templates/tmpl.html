@@ -106,7 +106,7 @@
             case 0: %}<img src="{%=o.svg%}" width="50" alt=""> Loading course information ... {% break; 
             case 1: %}
                 <a href="#" class="reload">The course information is empty <small>(click to retry)</small>.</a>
-                {% if ((o.err == 'Unauthorized') || (o.c >= 3)) { %}<span class="email">If this problem persists please contact <a href="mailto:help@vula.uct.ac.za?subject=Vula - Please help with: Course Dashboard">help@vula.uct.ac.za</a>.</span>{% } %}
+                {% if ((o.err == 'Unauthorized') || (o.c >= 3)) { %}<span class="email">If this problem persists please contact <a href="mailto:cilt-helpdesk@uct.ac.za?subject=Vula - Please help with: Course Dashboard">cilt-helpdesk@uct.ac.za</a>.</span>{% } %}
             {% break; 
             case 2: %}<span class="error">Course information could not be loaded.</span>{% break; 
         } %}

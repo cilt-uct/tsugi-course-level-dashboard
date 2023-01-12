@@ -1,6 +1,6 @@
 <?php
 require_once('../config.php');
-include 'tool-config-dist.php';
+// include 'tool-config-dist.php';
 include 'src/Template.php';
 
 use \Tsugi\Util\U;
